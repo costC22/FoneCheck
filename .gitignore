@@ -111,5 +111,5 @@ Thumbs.db
 
 # Project specific
 uploads/
-*.xlsx
-*.xls
+# *.xlsx
+# *.xls
