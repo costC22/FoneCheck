@@ -1,0 +1,550 @@
+/* Reset e configurações básicas */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.logo i {
+    font-size: 2.5rem;
+    color: #ffd700;
+}
+
+.logo h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.credits {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.credits small {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+.credits strong {
+    color: #ffd700;
+    font-weight: 600;
+}
+
+/* Cards principais */
+.upload-card, .search-card, .results-card, .help-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.upload-card:hover, .search-card:hover, .results-card:hover, .help-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+/* Seção de Busca */
+.search-description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+.tipo-busca-section {
+    margin-bottom: 30px;
+}
+
+.tipo-busca-section h3 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+.tipo-busca-options {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.tipo-option {
+    cursor: pointer;
+}
+
+.tipo-option input[type="radio"] {
+    display: none;
+}
+
+.tipo-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 3px solid #e1e8ed;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+.tipo-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.tipo-option input[type="radio"]:checked + .tipo-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.tipo-card i {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.tipo-card span {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.tipo-card small {
+    display: block;
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+.search-form {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.input-group {
+    position: relative;
+    flex: 1;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 2px solid #e1e8ed;
+    border-radius: 50px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.search-btn {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+}
+
+.search-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Seção de Resultados */
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.results-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.export-btn, .clear-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+}
+
+.clear-btn {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+}
+
+.export-btn:hover, .clear-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.results-info {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #666;
+    font-size: 1rem;
+}
+
+.info-item i {
+    color: #667eea;
+}
+
+.filters {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.filter-group input[type="text"] {
+    padding: 10px 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+}
+
+.filter-group input[type="text"]:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.filter-group input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.telefones-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 2px solid #e1e8ed;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.telefones-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.telefone-item {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.telefone-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.telefone-item i {
+    color: #27ae60;
+    font-size: 1.2rem;
+}
+
+.telefone-item span {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Seção de Ajuda */
+.help-card h3 {
+    color: #333;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.help-card h3 i {
+    color: #667eea;
+}
+
+.help-card ol {
+    padding-left: 20px;
+    margin-bottom: 20px;
+}
+
+.help-card li {
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.info-note {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-left: 4px solid #667eea;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #333;
+    font-weight: 500;
+}
+
+.info-note i {
+    color: #667eea;
+    font-size: 1.2rem;
+}
+
+/* Modal de Loading */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 40px;
+    border-radius: 20px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Notificação */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    z-index: 1001;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.success {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.notification.error {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.notification.info {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .logo h1 {
+        font-size: 2rem;
+    }
+    
+    .logo i {
+        font-size: 2rem;
+    }
+    
+    .search-form {
+        flex-direction: column;
+    }
+    
+    .search-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .tipo-busca-options {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .tipo-card {
+        min-width: 200px;
+    }
+    
+    .results-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .results-actions {
+        justify-content: center;
+    }
+    
+    .results-info {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+    }
+    
+    .telefones-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .upload-btn, .search-btn, .export-btn, .clear-btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .upload-card, .search-card, .results-card, .help-card {
+        padding: 20px;
+    }
+    
+    .modal-content {
+        width: 90%;
+        margin: 30% auto;
+        padding: 30px 20px;
+    }
+    
+    .notification {
+        right: 10px;
+        left: 10px;
+        transform: translateY(-100px);
+    }
+    
+    .notification.show {
+        transform: translateY(0);
+    }
+}

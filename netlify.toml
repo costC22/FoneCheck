@@ -1,0 +1,12 @@
+[build]
+  command = "python app.py"
+  functions = "functions"
+  publish = "."
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  PYTHON_VERSION = "3.9"

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FoneCheck - Buscador de Telefones</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="logo">
+          <i class="fas fa-phone-alt"></i>
+          <h1>FoneCheck</h1>
+        </div>
+        <p class="subtitle">Buscador inteligente de números de telefone</p>
+        <div class="credits">
+          <small
+            >Desenvolvido por <strong>Angelica Pedroso</strong> e
+            <strong>Bruno Costa</strong></small
+          >
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="search-section">
+          <div class="search-card">
+            <h2>Buscar Telefones</h2>
+            <p class="search-description">
+              <small
+                >OJA: códigos 15xxx, 18xxx, 20xxx, 22xxx, 30xxx | Popeyes: PLK +
+                códigos 12xxx, 13xxx, 14xxx</small
+              >
+            </p>
+
+            <div class="tipo-busca-section">
+              <h3>Selecione o tipo de busca:</h3>
+              <div class="tipo-busca-options">
+                <label class="tipo-option">
+                  <input type="radio" name="tipoBusca" value="BK" checked />
+                  <div class="tipo-card">
+                    <i class="fas fa-store"></i>
+                    <span>OJA</span>
+                    <small>15xxx, 18xxx, 20xxx, 22xxx, 30xxx</small>
+                  </div>
+                </label>
+                <label class="tipo-option">
+                  <input type="radio" name="tipoBusca" value="PK" />
+                  <div class="tipo-card">
+                    <i class="fas fa-hamburger"></i>
+                    <span>Popeyes</span>
+                    <small>PLK + 12xxx, 13xxx, 14xxx</small>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="search-form">
+              <div class="input-group">
+                <i class="fas fa-search"></i>
+                <input
+                  type="text"
+                  id="codigoInput"
+                  placeholder="Digite o código do colaborador"
+                />
+              </div>
+              <button id="searchBtn" class="search-btn">
+                <i class="fas fa-search"></i>
+                Buscar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display: none">
+          <div class="results-card">
+            <div class="results-header">
+              <h2>Resultados da Busca</h2>
+              <div class="results-actions">
+                <button id="exportBtn" class="export-btn">
+                  <i class="fas fa-download"></i>
+                  Exportar
+                </button>
+                <button id="clearBtn" class="clear-btn">
+                  <i class="fas fa-trash"></i>
+                  Limpar
+                </button>
+              </div>
+            </div>
+
+            <div class="results-info">
+              <div class="info-item">
+                <i class="fas fa-tag"></i>
+                <span>Tipo: <strong id="tipoResultado"></strong></span>
+              </div>
+              <div class="info-item">
+                <i class="fas fa-user"></i>
+                <span>Código: <strong id="codigoResultado"></strong></span>
+              </div>
+              <div class="info-item">
+                <i class="fas fa-phone"></i>
+                <span
+                  >Telefones encontrados: <strong id="totalTelefones"></strong
+                ></span>
+              </div>
+            </div>
+
+            <div class="filters">
+              <div class="filter-group">
+                <label for="filterInput">Filtrar telefones:</label>
+                <input
+                  type="text"
+                  id="filterInput"
+                  placeholder="Digite para filtrar..."
+                />
+              </div>
+              <div class="filter-group">
+                <label>
+                  <input type="checkbox" id="excludeNumbers" checked />
+                  Excluir números específicos
+                </label>
+              </div>
+            </div>
+
+            <div class="telefones-container">
+              <div id="telefonesList" class="telefones-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="help-section">
+          <div class="help-card">
+            <h3><i class="fas fa-info-circle"></i> Como usar</h3>
+            <ol>
+              <li>
+                Selecione o tipo de busca:
+                <strong>OJA (códigos 15xxx, 18xxx, 20xxx, 22xxx, 30xxx)</strong>
+                ou
+                <strong>Popeyes (PLK + códigos 12xxx, 13xxx, 14xxx)</strong>
+              </li>
+              <li>Digite o código do colaborador que deseja buscar</li>
+              <li>Clique em "Buscar" para encontrar os telefones</li>
+              <li>Use os filtros para refinar os resultados</li>
+              <li>Exporte os resultados se necessário</li>
+            </ol>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="loadingModal" class="modal">
+      <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <p>Processando arquivo...</p>
+      </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
