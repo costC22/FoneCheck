@@ -1,8 +1,14 @@
 services:
   - type: web
     name: fonecheck
-    env: docker
+    env: python
     plan: free
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    pythonVersion: 3.11
+    buildCommand: |
+      echo "🐍 Usando Python 3.11..."
+      python --version
+      python -m pip install --upgrade pip
+      python -m pip install --upgrade setuptools==68.2.2 wheel==0.41.2
+      python -m pip install -r requirements-python311.txt
+      echo "✅ Build concluído com Python 3.11!"
     startCommand: gunicorn --bind 0.0.0.0:$PORT app:app

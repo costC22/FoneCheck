@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: fonecheck-manual
+    env: python
+    plan: free
+    pythonVersion: 3.10.12
+    buildCommand: |
+      echo "🚨 FORÇANDO PYTHON 3.10.12 NO RENDER..."
+      
+      # Verificar versão atual
+      echo "Versão atual do Python:"
+      python --version
+      python3 --version
+      
+      # Instalar pyenv para forçar Python 3.10.12
+      echo "📦 Instalando pyenv..."
+      curl https://pyenv.run | bash
+      export PATH="$HOME/.pyenv/bin:$PATH"
+      eval "$(pyenv init -)"
+      
+      # Instalar Python 3.10.12
+      echo "🐍 Instalando Python 3.10.12 via pyenv..."
+      pyenv install 3.10.12
+      pyenv global 3.10.12
+      
+      # Verificar se funcionou
+      echo "✅ Versão após pyenv:"
+      python --version
+      python3 --version
+      
+      # Atualizar pip
+      python -m pip install --upgrade pip==23.3.1
+      
+      # Instalar setuptools e wheel primeiro
+      python -m pip install --upgrade setuptools==68.2.2 wheel==0.41.2
+      
+      # Instalar dependências
+      python -m pip install -r requirements-python310.txt
+      
+      echo "🎉 Build concluído com Python 3.10.12!"
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
