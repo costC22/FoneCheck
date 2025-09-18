@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: fonecheck-python310
+    env: python
+    plan: free
+    pythonVersion: 3.10.12
+    buildCommand: |
+      # Forçar Python 3.10.12
+      if command -v python3.10 &> /dev/null; then
+        PYTHON_CMD="python3.10"
+      elif command -v python3 &> /dev/null; then
+        PYTHON_CMD="python3"
+      else
+        PYTHON_CMD="python"
+      fi
+      
+      echo "🔧 Usando: $PYTHON_CMD"
+      $PYTHON_CMD --version
+      
+      # Atualizar pip
+      $PYTHON_CMD -m pip install --upgrade pip
+      
+      # Instalar setuptools e wheel primeiro
+      $PYTHON_CMD -m pip install --upgrade setuptools==68.2.2 wheel==0.41.2
+      
+      # Instalar dependências
+      $PYTHON_CMD -m pip install -r requirements-python310.txt
+      
+      echo "✅ Build concluído!"
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
