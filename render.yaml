@@ -1,6 +1,8 @@
 services:
   - type: web
     name: fonecheck
-    env: docker
+    env: python
     plan: free
-    dockerfilePath: ./Dockerfile
+    pythonVersion: 3.10.12
+    buildCommand: pip install -r requirements-render.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
