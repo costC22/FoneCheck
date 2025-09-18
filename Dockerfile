@@ -8,14 +8,21 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
+# Atualizar pip e instalar setuptools/wheel primeiro
+RUN python -m pip install --upgrade pip
+RUN pip install --upgrade setuptools==68.2.2 wheel==0.41.2
+
 # Copiar arquivos de requirements
-COPY requirements-minimal.txt .
+COPY requirements-python310.txt .
 
 # Instalar dependências Python
-RUN pip install --no-cache-dir -r requirements-minimal.txt
+RUN pip install --no-cache-dir -r requirements-python310.txt
 
 # Copiar código da aplicação
 COPY . .
+
+# Criar diretório para uploads
+RUN mkdir -p uploads
 
 # Expor porta
 EXPOSE 5000
