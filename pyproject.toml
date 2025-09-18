@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=65.0.0", "wheel>=0.38.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fonecheck"
+version = "1.0.0"
+description = "FoneCheck - Sistema de busca de telefones"
+authors = [{name = "FoneCheck Team"}]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "Flask==2.2.5",
+    "pandas==1.5.3",
+    "openpyxl==3.0.10",
+    "gunicorn==20.1.0",
+    "numpy==1.24.3",
+    "Werkzeug==2.2.3"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "flake8>=5.0.0"
+]

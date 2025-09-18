@@ -4,5 +4,8 @@ services:
     env: python
     plan: free
     pythonVersion: 3.10.12
-    buildCommand: pip install -r requirements-render.txt
+    buildCommand: |
+      python -m pip install --upgrade pip
+      pip install --upgrade setuptools wheel
+      pip install -r requirements-minimal.txt
     startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
