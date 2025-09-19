@@ -13,82 +13,60 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <nav class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <i class="fas fa-phone-alt"></i>
-                    <h1>FoneCheck</h1>
-                </div>
-                <p class="sidebar-subtitle">Sistema de Busca de Telefones</p>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-phone-alt"></i>
+                <h1>FoneCheck</h1>
             </div>
-            
-            <div class="sidebar-nav">
-                <div class="nav-item">
-                    <a href="#" class="nav-link active" data-section="search">
-                        <i class="fas fa-search"></i>
-                        Buscar Telefones
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" data-section="add">
-                        <i class="fas fa-plus-circle"></i>
-                        Adicionar Número
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" data-section="help">
-                        <i class="fas fa-question-circle"></i>
-                        Como Usar
-                    </a>
-                </div>
+            <p class="subtitle">Sistema de Busca de Telefones</p>
+            <div class="credits">
+                <small>Desenvolvido com <strong>❤️</strong> para Burger King e Popeyes</small>
             </div>
-        </nav>
+        </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Header -->
-            <header class="main-header">
-                <h2 id="mainTitle">
+        <!-- Tabs Container -->
+        <div class="tabs-container">
+            <!-- Tab Headers -->
+            <div class="tabs-header">
+                <button class="tab-button active" data-tab="search">
                     <i class="fas fa-search"></i>
                     Buscar Telefones
-                </h2>
-                <div class="header-actions">
-                    <div class="status-indicator">
-                        <div class="status-dot"></div>
-                        Sistema Online
+                </button>
+                <button class="tab-button" data-tab="add">
+                    <i class="fas fa-plus-circle"></i>
+                    Adicionar Número
+                </button>
+                <button class="tab-button" data-tab="help">
+                    <i class="fas fa-question-circle"></i>
+                    Como Usar
+                </button>
+            </div>
+
+            <!-- Tab Contents -->
+            <!-- Search Tab -->
+            <div class="tab-content active" id="search-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div>
+                            <h3 class="card-title">Buscar Telefones</h3>
+                            <p class="card-subtitle">Encontre números de telefone por código da loja</p>
+                        </div>
                     </div>
-                </div>
-            </header>
-
-            <!-- Mobile Menu Toggle -->
-            <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-
-            <!-- Search Section -->
-            <section class="content-section active" id="searchSection">
-                <div class="cards-grid">
-                    <!-- Search Card -->
-                    <div class="modern-card search-card">
-                        <div class="card-header">
-                            <div class="card-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <div>
-                                <h3 class="card-title">Buscar Telefones</h3>
-                                <p class="card-subtitle">Encontre números de telefone por código da loja</p>
-                            </div>
+                    
+                    <form class="search-form" id="searchForm">
+                        <div class="search-description">
+                            <p><strong>Burger King:</strong> 15xxx, 16xxx, 17xxx, 18xxx, 20xxx, 26xxx, 30xxx, 32xxx</p>
+                            <p><strong>Popeyes:</strong> PLK + 12xxx, 13xxx, 14xxx</p>
                         </div>
                         
-                        <form class="search-form" id="searchForm">
-                            <div class="search-description">
-                                <p><strong>Burger King:</strong> 15xxx, 16xxx, 17xxx, 18xxx, 20xxx, 26xxx, 30xxx, 32xxx</p>
-                                <p><strong>Popeyes:</strong> PLK + 12xxx, 13xxx, 14xxx</p>
-                            </div>
-                            
-                            <div class="tipo-selection">
+                        <div class="tipo-busca-section">
+                            <h3>Selecione o tipo de loja:</h3>
+                            <div class="tipo-busca-options">
                                 <div class="tipo-option">
                                     <input type="radio" name="tipoBusca" value="BK" id="tipoBK" checked>
                                     <label for="tipoBK" class="tipo-card">
@@ -106,147 +84,150 @@
                                     </label>
                                 </div>
                             </div>
-                            
-                            <div class="search-input-group">
-                                <i class="fas fa-key"></i>
-                                <input type="text" id="codigoInput" placeholder="Digite o PLK Number ou BK Number da loja desejada" required>
-                            </div>
-                            
-                            <button type="submit" class="search-btn" id="searchBtn">
-                                <i class="fas fa-search"></i>
-                                Buscar Telefones
+                        </div>
+                        
+                        <div class="search-input-group">
+                            <i class="fas fa-key"></i>
+                            <input type="text" id="codigoInput" placeholder="Digite o PLK Number ou BK Number da loja desejada" required>
+                        </div>
+                        
+                        <button type="submit" class="search-btn" id="searchBtn">
+                            <i class="fas fa-search"></i>
+                            Buscar Telefones
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Results Card -->
+                <div class="card" id="resultsCard" style="display: none;">
+                    <div class="results-header">
+                        <h3 class="results-title">
+                            <i class="fas fa-list-ul"></i>
+                            Resultados da Busca
+                        </h3>
+                        <div class="results-actions">
+                            <button id="exportBtn" class="action-btn export-btn">
+                                <i class="fas fa-download"></i>
+                                Exportar
                             </button>
-                        </form>
+                            <button id="exportSeparateBtn" class="action-btn export-separate-btn">
+                                <i class="fas fa-file-excel"></i>
+                                Exportar Separado
+                            </button>
+                            <button id="clearBtn" class="action-btn clear-btn">
+                                <i class="fas fa-trash"></i>
+                                Limpar
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Results Card -->
-                    <div class="modern-card results-card" id="resultsCard" style="display: none;">
-                        <div class="results-header">
-                            <h3 class="results-title">
-                                <i class="fas fa-list-ul"></i>
-                                Resultados da Busca
-                            </h3>
-                            <div class="results-actions">
-                                <button id="exportBtn" class="action-btn export-btn">
-                                    <i class="fas fa-download"></i>
-                                    Exportar
-                                </button>
-                                <button id="exportSeparateBtn" class="action-btn export-separate-btn">
-                                    <i class="fas fa-file-excel"></i>
-                                    Exportar Separado
-                                </button>
-                                <button id="clearBtn" class="action-btn clear-btn">
-                                    <i class="fas fa-trash"></i>
-                                    Limpar
-                                </button>
-                            </div>
+                    <div class="results-info" id="resultsInfo">
+                        <div class="info-card">
+                            <i class="fas fa-tag"></i>
+                            <div class="info-value" id="codigoResultado">-</div>
+                            <div class="info-label">Código</div>
                         </div>
-
-                        <div class="results-info" id="resultsInfo">
-                            <div class="info-card">
-                                <i class="fas fa-tag"></i>
-                                <div class="info-value" id="codigoResultado">-</div>
-                                <div class="info-label">Código</div>
-                            </div>
-                            <div class="info-card">
-                                <i class="fas fa-building"></i>
-                                <div class="info-value" id="tipoResultado">-</div>
-                                <div class="info-label">Tipo</div>
-                            </div>
-                            <div class="info-card">
-                                <i class="fas fa-phone"></i>
-                                <div class="info-value" id="totalTelefones">0</div>
-                                <div class="info-label">Telefones</div>
-                            </div>
+                        <div class="info-card">
+                            <i class="fas fa-building"></i>
+                            <div class="info-value" id="tipoResultado">-</div>
+                            <div class="info-label">Tipo</div>
                         </div>
+                        <div class="info-card">
+                            <i class="fas fa-phone"></i>
+                            <div class="info-value" id="totalTelefones">0</div>
+                            <div class="info-label">Telefones</div>
+                        </div>
+                    </div>
 
-                        <div class="filters-section">
-                            <h4 class="filters-title">
-                                <i class="fas fa-filter"></i>
-                                Filtros
-                            </h4>
-                            <div class="filters-grid">
-                                <div class="filter-group">
-                                    <label for="filterInput">Filtrar por número:</label>
-                                    <input type="text" id="filterInput" placeholder="Digite parte do número...">
-                                </div>
-                                <div class="filter-group">
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="excludeNumbers">
-                                        <label for="excludeNumbers">Excluir números vazios</label>
-                                    </div>
+                    <div class="filters-section">
+                        <h4 class="filters-title">
+                            <i class="fas fa-filter"></i>
+                            Filtros
+                        </h4>
+                        <div class="filters-grid">
+                            <div class="filter-group">
+                                <label for="filterInput">Filtrar por número:</label>
+                                <input type="text" id="filterInput" placeholder="Digite parte do número...">
+                            </div>
+                            <div class="filter-group">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="excludeNumbers">
+                                    <label for="excludeNumbers">Excluir números vazios</label>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="telefones-container">
-                            <div class="telefones-grid" id="telefonesList">
-                                <!-- Telefones serão inseridos aqui -->
-                            </div>
+                    <div class="telefones-container">
+                        <div class="telefones-grid" id="telefonesList">
+                            <!-- Telefones serão inseridos aqui -->
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- Add Number Section -->
-            <section class="content-section" id="addSection">
-                <div class="cards-grid">
-                    <div class="modern-card">
-                        <div class="card-header">
-                            <div class="card-icon">
-                                <i class="fas fa-plus-circle"></i>
-                            </div>
-                            <div>
-                                <h3 class="card-title">Adicionar Novo Número</h3>
-                                <p class="card-subtitle">Adicione novos números ao banco de dados</p>
-                            </div>
+            <!-- Add Tab -->
+            <div class="tab-content" id="add-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-plus-circle"></i>
                         </div>
-                        
-                        <form class="add-form" id="addNumberForm">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="newCode">Código da Loja:</label>
-                                    <input
-                                        type="text"
-                                        id="newCode"
-                                        placeholder="Ex: 18823"
-                                        required
-                                    />
-                                </div>
-                                <div class="form-group">
-                                    <label for="newType">Tipo:</label>
-                                    <select id="newType" required>
-                                        <option value="">Selecione o tipo</option>
-                                        <option value="BK">Burger King</option>
-                                        <option value="PK">Popeyes</option>
-                                    </select>
-                                </div>
-                            </div>
+                        <div>
+                            <h3 class="card-title">Adicionar Novo Número</h3>
+                            <p class="card-subtitle">Adicione novos números ao banco de dados</p>
+                        </div>
+                    </div>
+                    
+                    <form class="add-form" id="addNumberForm">
+                        <div class="form-row">
                             <div class="form-group">
-                                <label for="newPhone">Telefone:</label>
+                                <label for="newCode">Código da Loja:</label>
                                 <input
                                     type="text"
-                                    id="newPhone"
-                                    placeholder="Ex: 11999999999"
+                                    id="newCode"
+                                    placeholder="Ex: 18823"
                                     required
                                 />
                             </div>
-                            <button type="submit" class="add-btn">
-                                <i class="fas fa-plus"></i>
-                                Adicionar Número
-                            </button>
-                        </form>
-                    </div>
+                            <div class="form-group">
+                                <label for="newType">Tipo:</label>
+                                <select id="newType" required>
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="BK">Burger King</option>
+                                    <option value="PK">Popeyes</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPhone">Telefone:</label>
+                            <input
+                                type="text"
+                                id="newPhone"
+                                placeholder="Ex: 11999999999"
+                                required
+                            />
+                        </div>
+                        <button type="submit" class="add-btn">
+                            <i class="fas fa-plus"></i>
+                            Adicionar Número
+                        </button>
+                    </form>
                 </div>
-            </section>
+            </div>
 
-            <!-- Help Section -->
-            <section class="content-section" id="helpSection">
-                <div class="help-section">
-                    <h3 class="help-title">
-                        <i class="fas fa-lightbulb"></i>
-                        Como usar o FoneCheck
-                    </h3>
+            <!-- Help Tab -->
+            <div class="tab-content" id="help-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div>
+                            <h3 class="card-title">Como usar o FoneCheck</h3>
+                            <p class="card-subtitle">Guia completo para usar o sistema</p>
+                        </div>
+                    </div>
                     
                     <div class="help-steps">
                         <div class="step-card">
@@ -281,8 +262,8 @@
                         </div>
                     </div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
     </div>
 
     <!-- Loading Modal -->

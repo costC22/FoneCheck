@@ -25,12 +25,9 @@ const newCodeInput = document.getElementById('newCode');
 const newTypeSelect = document.getElementById('newType');
 const newPhoneInput = document.getElementById('newPhone');
 
-// Elementos do dashboard
-const sidebar = document.getElementById('sidebar');
-const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-const navLinks = document.querySelectorAll('.nav-link');
-const contentSections = document.querySelectorAll('.content-section');
-const mainTitle = document.getElementById('mainTitle');
+// Elementos das tabs
+const tabButtons = document.querySelectorAll('.tab-button');
+const tabContents = document.querySelectorAll('.tab-content');
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
@@ -50,15 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Event listeners do dashboard
-    mobileMenuToggle.addEventListener('click', toggleMobileMenu);
-    
-    // Event listeners da navegação
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const section = this.getAttribute('data-section');
-            navigateToSection(section);
+    // Event listeners das tabs
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            switchTab(tabId);
         });
     });
     
@@ -69,7 +62,21 @@ document.addEventListener('DOMContentLoaded', function() {
             codigoInput.placeholder = 'Digite o PLK Number ou BK Number da loja desejada';
         });
     });
+    
+    // Inicializar placeholder
+    codigoInput.placeholder = 'Digite o PLK Number ou BK Number da loja desejada';
 });
+
+// Função para alternar entre tabs
+function switchTab(tabId) {
+    // Remover classe active de todos os botões e conteúdos
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active'));
+    
+    // Adicionar classe active ao botão e conteúdo selecionados
+    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+    document.getElementById(`${tabId}-tab`).classList.add('active');
+}
 
 // Função para mostrar notificação
 function mostrarNotificacao(mensagem, tipo = 'info') {
@@ -79,25 +86,20 @@ function mostrarNotificacao(mensagem, tipo = 'info') {
     
     setTimeout(() => {
         notification.classList.remove('show');
-    }, 3000);
+    }, 4000);
 }
 
-// Função para mostrar/ocultar modal de loading
-function toggleLoading(mostrar) {
-    if (mostrar) {
-        loadingModal.style.display = 'block';
-    } else {
-        loadingModal.style.display = 'none';
-    }
+// Função para mostrar/ocultar loading
+function toggleLoading(show) {
+    loadingModal.style.display = show ? 'block' : 'none';
 }
 
-// Função principal de busca
+// Função para buscar telefones
 async function buscarTelefones() {
     const codigo = codigoInput.value.trim();
     
-    // Validações
     if (!codigo) {
-        mostrarNotificacao('Por favor, digite o código para buscar', 'error');
+        mostrarNotificacao('Por favor, digite um código', 'error');
         return;
     }
     
@@ -105,7 +107,6 @@ async function buscarTelefones() {
     searchBtn.disabled = true;
     
     try {
-        // Fazer requisição para o backend
         const response = await fetch('/buscar', {
             method: 'POST',
             headers: {
@@ -113,7 +114,7 @@ async function buscarTelefones() {
             },
             body: JSON.stringify({
                 codigo: codigo,
-                tipo_busca: tipoBuscaAtual
+                tipo: tipoBuscaAtual
             })
         });
         
@@ -121,7 +122,6 @@ async function buscarTelefones() {
         
         if (resultado.sucesso) {
             telefonesEncontrados = resultado.telefones;
-            codigoAtual = codigo;
             
             // Atualizar interface
             tipoResultado.textContent = `${tipoBuscaAtual} (${tipoBuscaAtual === 'BK' ? 'Burger King' : 'Popeyes'})`;
@@ -251,78 +251,6 @@ function limparResultados() {
     mostrarNotificacao('Resultados limpos', 'info');
 }
 
-// Inicializar placeholder
-document.addEventListener('DOMContentLoaded', function() {
-    codigoInput.placeholder = 'Digite o PLK Number ou BK Number da loja desejada';
-});
-
-// Função para verificar saúde da aplicação
-async function verificarSaude() {
-    try {
-        const response = await fetch('/health');
-        const resultado = await response.json();
-        console.log('Status da aplicação:', resultado);
-    } catch (error) {
-        console.error('Erro ao verificar saúde da aplicação:', error);
-    }
-}
-
-// Verificar saúde ao carregar a página
-document.addEventListener('DOMContentLoaded', verificarSaude);
-
-// Funções do Dashboard
-function toggleMobileMenu() {
-    sidebar.classList.toggle('open');
-}
-
-function navigateToSection(section) {
-    // Remover classe active de todos os links
-    navLinks.forEach(link => link.classList.remove('active'));
-    
-    // Adicionar classe active ao link clicado
-    const activeLink = document.querySelector(`[data-section="${section}"]`);
-    if (activeLink) {
-        activeLink.classList.add('active');
-    }
-    
-    // Esconder todas as seções
-    contentSections.forEach(sec => sec.classList.remove('active'));
-    
-    // Mostrar a seção selecionada
-    const targetSection = document.getElementById(`${section}Section`);
-    if (targetSection) {
-        targetSection.classList.add('active');
-    }
-    
-    // Atualizar título principal
-    updateMainTitle(section);
-    
-    // Fechar menu mobile se estiver aberto
-    sidebar.classList.remove('open');
-}
-
-function updateMainTitle(section) {
-    const titles = {
-        'search': {
-            icon: 'fas fa-search',
-            text: 'Buscar Telefones'
-        },
-        'add': {
-            icon: 'fas fa-plus-circle',
-            text: 'Adicionar Número'
-        },
-        'help': {
-            icon: 'fas fa-question-circle',
-            text: 'Como Usar'
-        }
-    };
-    
-    const title = titles[section];
-    if (title) {
-        mainTitle.innerHTML = `<i class="${title.icon}"></i> ${title.text}`;
-    }
-}
-
 // Função para exportar telefones separadamente
 async function exportarTelefonesSeparados() {
     if (telefonesEncontrados.length === 0) {
@@ -411,3 +339,17 @@ async function adicionarNumero(event) {
         toggleLoading(false);
     }
 }
+
+// Função para verificar saúde da aplicação
+async function verificarSaude() {
+    try {
+        const response = await fetch('/health');
+        const data = await response.json();
+        console.log('Status da aplicação:', data);
+    } catch (error) {
+        console.error('Erro ao verificar saúde da aplicação:', error);
+    }
+}
+
+// Verificar saúde ao carregar a página
+document.addEventListener('DOMContentLoaded', verificarSaude);
