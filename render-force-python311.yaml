@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: fonecheck
+    name: fonecheck-force-python311
     env: python
     plan: free
     pythonVersion: 3.11
