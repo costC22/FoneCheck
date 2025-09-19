@@ -94,7 +94,7 @@ async function buscarTelefones() {
             codigoAtual = codigo;
             
             // Atualizar interface
-            tipoResultado.textContent = `${tipoBuscaAtual} (${tipoBuscaAtual === 'BK' ? 'OJA' : 'Popeyes'})`;
+            tipoResultado.textContent = `${tipoBuscaAtual} (${tipoBuscaAtual === 'BK' ? 'Burger King' : 'Popeyes'})`;
             codigoResultado.textContent = codigo;
             totalTelefones.textContent = resultado.total;
             
