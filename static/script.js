@@ -6,7 +6,7 @@ let tipoBuscaAtual = 'BK';
 // Elementos DOM
 const codigoInput = document.getElementById('codigoInput');
 const searchBtn = document.getElementById('searchBtn');
-const resultsSection = document.getElementById('resultsSection');
+const resultsCard = document.getElementById('resultsCard');
 const telefonesList = document.getElementById('telefonesList');
 const totalTelefones = document.getElementById('totalTelefones');
 const codigoResultado = document.getElementById('codigoResultado');
@@ -25,8 +25,16 @@ const newCodeInput = document.getElementById('newCode');
 const newTypeSelect = document.getElementById('newType');
 const newPhoneInput = document.getElementById('newPhone');
 
+// Elementos do dashboard
+const sidebar = document.getElementById('sidebar');
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const navLinks = document.querySelectorAll('.nav-link');
+const contentSections = document.querySelectorAll('.content-section');
+const mainTitle = document.getElementById('mainTitle');
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // Event listeners principais
     searchBtn.addEventListener('click', buscarTelefones);
     exportBtn.addEventListener('click', exportarTelefones);
     exportSeparateBtn.addEventListener('click', exportarTelefonesSeparados);
@@ -35,17 +43,29 @@ document.addEventListener('DOMContentLoaded', function() {
     excludeNumbers.addEventListener('change', filtrarTelefones);
     addNumberForm.addEventListener('submit', adicionarNumero);
     
+    // Event listener para Enter no input
     codigoInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             buscarTelefones();
         }
     });
     
+    // Event listeners do dashboard
+    mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+    
+    // Event listeners da navegação
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const section = this.getAttribute('data-section');
+            navigateToSection(section);
+        });
+    });
+    
     // Listener para mudança de tipo de busca
     document.querySelectorAll('input[name="tipoBusca"]').forEach(radio => {
         radio.addEventListener('change', function() {
             tipoBuscaAtual = this.value;
-            // Atualizar placeholder do input
             codigoInput.placeholder = 'Digite o PLK Number ou BK Number da loja desejada';
         });
     });
@@ -110,7 +130,7 @@ async function buscarTelefones() {
             
             // Mostrar resultados
             exibirTelefones(telefonesEncontrados);
-            resultsSection.style.display = 'block';
+            resultsCard.style.display = 'block';
             
             mostrarNotificacao(`Encontrados ${resultado.total} telefones para código ${codigo}`, 'success');
         } else {
@@ -131,18 +151,20 @@ function exibirTelefones(telefones) {
     telefonesList.innerHTML = '';
     
     if (telefones.length === 0) {
-        telefonesList.innerHTML = '<p class="no-results">Nenhum telefone encontrado</p>';
+        telefonesList.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.7); font-size: 1.1rem;">Nenhum telefone encontrado</div>';
         return;
     }
     
     telefones.forEach(telefone => {
-        const telefoneItem = document.createElement('div');
-        telefoneItem.className = 'telefone-item';
-        telefoneItem.innerHTML = `
-            <i class="fas fa-phone"></i>
-            <span>${telefone}</span>
+        const telefoneCard = document.createElement('div');
+        telefoneCard.className = 'telefone-card';
+        telefoneCard.innerHTML = `
+            <div class="telefone-icon">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="telefone-number">${telefone}</div>
         `;
-        telefonesList.appendChild(telefoneItem);
+        telefonesList.appendChild(telefoneCard);
     });
 }
 
@@ -220,7 +242,7 @@ async function exportarTelefones() {
 function limparResultados() {
     telefonesEncontrados = [];
     codigoAtual = '';
-    resultsSection.style.display = 'none';
+    resultsCard.style.display = 'none';
     codigoInput.value = '';
     filterInput.value = '';
     excludeNumbers.checked = true;
@@ -247,6 +269,59 @@ async function verificarSaude() {
 
 // Verificar saúde ao carregar a página
 document.addEventListener('DOMContentLoaded', verificarSaude);
+
+// Funções do Dashboard
+function toggleMobileMenu() {
+    sidebar.classList.toggle('open');
+}
+
+function navigateToSection(section) {
+    // Remover classe active de todos os links
+    navLinks.forEach(link => link.classList.remove('active'));
+    
+    // Adicionar classe active ao link clicado
+    const activeLink = document.querySelector(`[data-section="${section}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+    
+    // Esconder todas as seções
+    contentSections.forEach(sec => sec.classList.remove('active'));
+    
+    // Mostrar a seção selecionada
+    const targetSection = document.getElementById(`${section}Section`);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+    
+    // Atualizar título principal
+    updateMainTitle(section);
+    
+    // Fechar menu mobile se estiver aberto
+    sidebar.classList.remove('open');
+}
+
+function updateMainTitle(section) {
+    const titles = {
+        'search': {
+            icon: 'fas fa-search',
+            text: 'Buscar Telefones'
+        },
+        'add': {
+            icon: 'fas fa-plus-circle',
+            text: 'Adicionar Número'
+        },
+        'help': {
+            icon: 'fas fa-question-circle',
+            text: 'Como Usar'
+        }
+    };
+    
+    const title = titles[section];
+    if (title) {
+        mainTitle.innerHTML = `<i class="${title.icon}"></i> ${title.text}`;
+    }
+}
 
 // Função para exportar telefones separadamente
 async function exportarTelefonesSeparados() {
