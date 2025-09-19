@@ -1,110 +1,80 @@
-// Variáveis globais
-let telefonesEncontrados = [];
-let codigoAtual = '';
-let tipoBuscaAtual = 'BK';
-
 // Elementos DOM
-const codigoInput = document.getElementById('codigoInput');
+const searchForm = document.getElementById('searchForm');
 const searchBtn = document.getElementById('searchBtn');
+const codigoInput = document.getElementById('codigoInput');
 const resultsCard = document.getElementById('resultsCard');
-const telefonesList = document.getElementById('telefonesList');
-const totalTelefones = document.getElementById('totalTelefones');
-const codigoResultado = document.getElementById('codigoResultado');
-const tipoResultado = document.getElementById('tipoResultado');
-const filterInput = document.getElementById('filterInput');
-const excludeNumbers = document.getElementById('excludeNumbers');
+const resultsInfo = document.getElementById('resultsInfo');
+const telefonesGrid = document.getElementById('telefonesGrid');
+const filtersSection = document.getElementById('filtersSection');
+const clearBtn = document.getElementById('clearBtn');
 const exportBtn = document.getElementById('exportBtn');
 const exportSeparateBtn = document.getElementById('exportSeparateBtn');
-const clearBtn = document.getElementById('clearBtn');
+const addNumberForm = document.getElementById('addNumberForm');
 const loadingModal = document.getElementById('loadingModal');
 const notification = document.getElementById('notification');
+const notificationText = document.getElementById('notificationText');
 
-// Elementos do formulário de adicionar número
-const addNumberForm = document.getElementById('addNumberForm');
-const newCodeInput = document.getElementById('newCode');
-const newTypeSelect = document.getElementById('newType');
-const newPhoneInput = document.getElementById('newPhone');
+// Filtros
+const filterNome = document.getElementById('filterNome');
+const filterTelefone = document.getElementById('filterTelefone');
+const filterDuplicados = document.getElementById('filterDuplicados');
 
-// Elementos das tabs
-const tabButtons = document.querySelectorAll('.tab-button');
-const tabContents = document.querySelectorAll('.tab-content');
+// Dados globais
+let telefonesData = [];
+let telefonesFiltrados = [];
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
-    // Event listeners principais
-    searchBtn.addEventListener('click', buscarTelefones);
+    // Placeholder do input
+    codigoInput.placeholder = "Digite o PLK Number ou BK Number da loja desejada";
+    
+    // Event listeners
+    searchForm.addEventListener('submit', buscarTelefones);
+    clearBtn.addEventListener('click', limparResultados);
     exportBtn.addEventListener('click', exportarTelefones);
     exportSeparateBtn.addEventListener('click', exportarTelefonesSeparados);
-    clearBtn.addEventListener('click', limparResultados);
-    filterInput.addEventListener('input', filtrarTelefones);
-    excludeNumbers.addEventListener('change', filtrarTelefones);
     addNumberForm.addEventListener('submit', adicionarNumero);
     
-    // Event listener para Enter no input
-    codigoInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            buscarTelefones();
-        }
-    });
-    
-    // Event listeners das tabs
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const tabId = this.getAttribute('data-tab');
-            switchTab(tabId);
-        });
-    });
-    
-    // Listener para mudança de tipo de busca
-    document.querySelectorAll('input[name="tipoBusca"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            tipoBuscaAtual = this.value;
-            codigoInput.placeholder = 'Digite o PLK Number ou BK Number da loja desejada';
-        });
-    });
-    
-    // Inicializar placeholder
-    codigoInput.placeholder = 'Digite o PLK Number ou BK Number da loja desejada';
+    // Filtros
+    filterNome.addEventListener('input', aplicarFiltros);
+    filterTelefone.addEventListener('input', aplicarFiltros);
+    filterDuplicados.addEventListener('change', aplicarFiltros);
 });
 
-// Função para alternar entre tabs
-function switchTab(tabId) {
-    // Remover classe active de todos os botões e conteúdos
-    tabButtons.forEach(btn => btn.classList.remove('active'));
-    tabContents.forEach(content => content.classList.remove('active'));
-    
-    // Adicionar classe active ao botão e conteúdo selecionados
-    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-    document.getElementById(`${tabId}-tab`).classList.add('active');
+// Função para mostrar loading
+function mostrarLoading() {
+    loadingModal.style.display = 'block';
+}
+
+// Função para esconder loading
+function esconderLoading() {
+    loadingModal.style.display = 'none';
 }
 
 // Função para mostrar notificação
-function mostrarNotificacao(mensagem, tipo = 'info') {
-    notification.textContent = mensagem;
+function mostrarNotificacao(texto, tipo = 'info') {
+    notificationText.textContent = texto;
     notification.className = `notification ${tipo}`;
     notification.classList.add('show');
     
     setTimeout(() => {
         notification.classList.remove('show');
-    }, 4000);
-}
-
-// Função para mostrar/ocultar loading
-function toggleLoading(show) {
-    loadingModal.style.display = show ? 'block' : 'none';
+    }, 3000);
 }
 
 // Função para buscar telefones
-async function buscarTelefones() {
+async function buscarTelefones(e) {
+    e.preventDefault();
+    
     const codigo = codigoInput.value.trim();
+    const tipoBusca = document.querySelector('input[name="tipoBusca"]:checked').value;
     
     if (!codigo) {
-        mostrarNotificacao('Por favor, digite um código', 'error');
+        mostrarNotificacao('Por favor, digite um código válido', 'error');
         return;
     }
     
-    toggleLoading(true);
-    searchBtn.disabled = true;
+    mostrarLoading();
     
     try {
         const response = await fetch('/buscar', {
@@ -114,93 +84,153 @@ async function buscarTelefones() {
             },
             body: JSON.stringify({
                 codigo: codigo,
-                tipo: tipoBuscaAtual
+                tipo_busca: tipoBusca
             })
         });
         
-        const resultado = await response.json();
+        const data = await response.json();
         
-        if (resultado.sucesso) {
-            telefonesEncontrados = resultado.telefones;
+        if (data.sucesso) {
+            telefonesData = data.telefones || [];
+            telefonesFiltrados = [...telefonesData];
             
-            // Atualizar interface
-            tipoResultado.textContent = `${tipoBuscaAtual} (${tipoBuscaAtual === 'BK' ? 'Burger King' : 'Popeyes'})`;
-            codigoResultado.textContent = codigo;
-            totalTelefones.textContent = resultado.total;
-            
-            // Mostrar resultados
-            exibirTelefones(telefonesEncontrados);
-            resultsCard.style.display = 'block';
-            
-            mostrarNotificacao(`Encontrados ${resultado.total} telefones para código ${codigo}`, 'success');
+            exibirResultados(data);
+            mostrarNotificacao(`Encontrados ${telefonesData.length} telefones!`, 'success');
         } else {
-            mostrarNotificacao(`Erro: ${resultado.erro}`, 'error');
+            mostrarNotificacao(data.erro || 'Erro ao buscar telefones', 'error');
         }
-        
     } catch (error) {
-        console.error('Erro na requisição:', error);
-        mostrarNotificacao('Erro ao processar busca. Tente novamente.', 'error');
+        console.error('Erro:', error);
+        mostrarNotificacao('Erro de conexão. Tente novamente.', 'error');
     } finally {
-        toggleLoading(false);
-        searchBtn.disabled = false;
+        esconderLoading();
     }
+}
+
+// Função para exibir resultados
+function exibirResultados(data) {
+    // Mostrar card de resultados
+    resultsCard.style.display = 'block';
+    
+    // Atualizar informações
+    const tipoResultado = data.tipo_busca === 'BK' ? 'Burger King' : 'Popeyes';
+    const totalTelefones = telefonesData.length;
+    const lojasUnicas = [...new Set(telefonesData.map(t => t.nome_loja))].length;
+    
+    resultsInfo.innerHTML = `
+        <div class="info-card">
+            <i class="fas fa-store"></i>
+            <div class="info-value">${tipoResultado}</div>
+            <div class="info-label">Tipo de Loja</div>
+        </div>
+        <div class="info-card">
+            <i class="fas fa-phone"></i>
+            <div class="info-value">${totalTelefones}</div>
+            <div class="info-label">Total de Telefones</div>
+        </div>
+        <div class="info-card">
+            <i class="fas fa-building"></i>
+            <div class="info-value">${lojasUnicas}</div>
+            <div class="info-label">Lojas Encontradas</div>
+        </div>
+        <div class="info-card">
+            <i class="fas fa-key"></i>
+            <div class="info-value">${data.codigo}</div>
+            <div class="info-label">Código Buscado</div>
+        </div>
+    `;
+    
+    // Mostrar seção de filtros se houver telefones
+    if (totalTelefones > 0) {
+        filtersSection.style.display = 'block';
+    }
+    
+    // Exibir telefones
+    exibirTelefones();
+    
+    // Scroll para resultados
+    resultsCard.scrollIntoView({ behavior: 'smooth' });
 }
 
 // Função para exibir telefones
-function exibirTelefones(telefones) {
-    telefonesList.innerHTML = '';
-    
-    if (telefones.length === 0) {
-        telefonesList.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.7); font-size: 1.1rem;">Nenhum telefone encontrado</div>';
+function exibirTelefones() {
+    if (telefonesFiltrados.length === 0) {
+        telefonesGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #718096;">
+                <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+                <p>Nenhum telefone encontrado com os filtros aplicados.</p>
+            </div>
+        `;
         return;
     }
     
-    telefones.forEach(telefone => {
-        const telefoneCard = document.createElement('div');
-        telefoneCard.className = 'telefone-card';
-        telefoneCard.innerHTML = `
+    telefonesGrid.innerHTML = telefonesFiltrados.map(telefone => `
+        <div class="telefone-card">
             <div class="telefone-icon">
                 <i class="fas fa-phone"></i>
             </div>
-            <div class="telefone-number">${telefone}</div>
-        `;
-        telefonesList.appendChild(telefoneCard);
-    });
+            <div class="telefone-number">${telefone.telefone}</div>
+        </div>
+    `).join('');
 }
 
-// Função para filtrar telefones
-function filtrarTelefones() {
-    const filtro = filterInput.value.toLowerCase();
-    const excluirNumeros = excludeNumbers.checked;
+// Função para aplicar filtros
+function aplicarFiltros() {
+    let filtrados = [...telefonesData];
     
-    let telefonesFiltrados = [...telefonesEncontrados];
-    
-    // Aplicar filtro de texto
-    if (filtro) {
-        telefonesFiltrados = telefonesFiltrados.filter(telefone => 
-            telefone.toLowerCase().includes(filtro)
+    // Filtro por nome
+    const nomeFiltro = filterNome.value.toLowerCase().trim();
+    if (nomeFiltro) {
+        filtrados = filtrados.filter(t => 
+            t.nome_loja.toLowerCase().includes(nomeFiltro)
         );
     }
     
-    // Aplicar exclusão de números específicos
-    if (excluirNumeros) {
-        const numerosExcluidos = ['+5531996272142', '+5527981824400'];
-        telefonesFiltrados = telefonesFiltrados.filter(telefone => 
-            !numerosExcluidos.includes(telefone)
+    // Filtro por telefone
+    const telefoneFiltro = filterTelefone.value.trim();
+    if (telefoneFiltro) {
+        filtrados = filtrados.filter(t => 
+            t.telefone.includes(telefoneFiltro)
         );
     }
     
-    // Atualizar exibição
-    exibirTelefones(telefonesFiltrados);
-    totalTelefones.textContent = telefonesFiltrados.length;
+    // Filtro de duplicados
+    if (filterDuplicados.checked) {
+        const telefonesUnicos = new Set();
+        filtrados = filtrados.filter(t => {
+            if (telefonesUnicos.has(t.telefone)) {
+                return false;
+            }
+            telefonesUnicos.add(t.telefone);
+            return true;
+        });
+    }
+    
+    telefonesFiltrados = filtrados;
+    exibirTelefones();
+}
+
+// Função para limpar resultados
+function limparResultados() {
+    resultsCard.style.display = 'none';
+    telefonesData = [];
+    telefonesFiltrados = [];
+    codigoInput.value = '';
+    
+    // Limpar filtros
+    filterNome.value = '';
+    filterTelefone.value = '';
+    filterDuplicados.checked = false;
 }
 
 // Função para exportar telefones
 async function exportarTelefones() {
-    if (telefonesEncontrados.length === 0) {
+    if (telefonesData.length === 0) {
         mostrarNotificacao('Nenhum telefone para exportar', 'error');
         return;
     }
+    
+    mostrarLoading();
     
     try {
         const response = await fetch('/exportar', {
@@ -209,19 +239,16 @@ async function exportarTelefones() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                telefones: telefonesEncontrados,
-                codigo: codigoAtual,
-                tipo_busca: tipoBuscaAtual
+                telefones: telefonesData
             })
         });
         
         if (response.ok) {
-            // Baixar arquivo
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `telefones_${tipoBuscaAtual}_${codigoAtual}.xlsx`;
+            a.download = 'telefones_busca.xlsx';
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -229,34 +256,25 @@ async function exportarTelefones() {
             
             mostrarNotificacao('Arquivo exportado com sucesso!', 'success');
         } else {
-            const erro = await response.json();
-            mostrarNotificacao(`Erro na exportação: ${erro.erro}`, 'error');
+            const data = await response.json();
+            mostrarNotificacao(data.erro || 'Erro ao exportar arquivo', 'error');
         }
     } catch (error) {
-        console.error('Erro na exportação:', error);
-        mostrarNotificacao('Erro ao exportar arquivo', 'error');
+        console.error('Erro:', error);
+        mostrarNotificacao('Erro de conexão. Tente novamente.', 'error');
+    } finally {
+        esconderLoading();
     }
 }
 
-// Função para limpar resultados
-function limparResultados() {
-    telefonesEncontrados = [];
-    codigoAtual = '';
-    resultsCard.style.display = 'none';
-    codigoInput.value = '';
-    filterInput.value = '';
-    excludeNumbers.checked = true;
-    telefonesList.innerHTML = '';
-    
-    mostrarNotificacao('Resultados limpos', 'info');
-}
-
-// Função para exportar telefones separadamente
+// Função para exportar telefones separados
 async function exportarTelefonesSeparados() {
-    if (telefonesEncontrados.length === 0) {
+    if (telefonesData.length === 0) {
         mostrarNotificacao('Nenhum telefone para exportar', 'error');
         return;
     }
+    
+    mostrarLoading();
     
     try {
         const response = await fetch('/exportar-separado', {
@@ -265,49 +283,47 @@ async function exportarTelefonesSeparados() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                telefones: telefonesEncontrados,
-                codigo: codigoAtual,
-                tipo_busca: tipoBuscaAtual
+                telefones: telefonesData
             })
         });
         
         if (response.ok) {
-            // Baixar arquivo
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `telefones_separados_${tipoBuscaAtual}_${codigoAtual}.xlsx`;
+            a.download = 'telefones_detalhado.xlsx';
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
             
-            mostrarNotificacao('Arquivo separado exportado com sucesso!', 'success');
+            mostrarNotificacao('Arquivo detalhado exportado com sucesso!', 'success');
         } else {
-            const erro = await response.json();
-            mostrarNotificacao(`Erro na exportação: ${erro.erro}`, 'error');
+            const data = await response.json();
+            mostrarNotificacao(data.erro || 'Erro ao exportar arquivo', 'error');
         }
     } catch (error) {
-        console.error('Erro na exportação:', error);
-        mostrarNotificacao('Erro ao exportar arquivo separado', 'error');
+        console.error('Erro:', error);
+        mostrarNotificacao('Erro de conexão. Tente novamente.', 'error');
+    } finally {
+        esconderLoading();
     }
 }
 
-// Função para adicionar novo número
-async function adicionarNumero(event) {
-    event.preventDefault();
+// Função para adicionar número
+async function adicionarNumero(e) {
+    e.preventDefault();
     
-    const codigo = newCodeInput.value.trim();
-    const tipo = newTypeSelect.value;
-    const telefone = newPhoneInput.value.trim();
+    const formData = new FormData(addNumberForm);
+    const dados = {
+        tipo: formData.get('tipo'),
+        codigo: formData.get('codigo'),
+        nome: formData.get('nome'),
+        telefone: formData.get('telefone')
+    };
     
-    if (!codigo || !tipo || !telefone) {
-        mostrarNotificacao('Todos os campos são obrigatórios', 'error');
-        return;
-    }
-    
-    toggleLoading(true);
+    mostrarLoading();
     
     try {
         const response = await fetch('/adicionar-numero', {
@@ -315,41 +331,21 @@ async function adicionarNumero(event) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                codigo: codigo,
-                tipo: tipo,
-                telefone: telefone
-            })
+            body: JSON.stringify(dados)
         });
         
-        const resultado = await response.json();
+        const data = await response.json();
         
-        if (resultado.sucesso) {
-            mostrarNotificacao(resultado.mensagem, 'success');
-            // Limpar formulário
+        if (data.sucesso) {
+            mostrarNotificacao('Número adicionado com sucesso!', 'success');
             addNumberForm.reset();
         } else {
-            mostrarNotificacao(`Erro: ${resultado.erro}`, 'error');
+            mostrarNotificacao(data.erro || 'Erro ao adicionar número', 'error');
         }
-        
     } catch (error) {
-        console.error('Erro ao adicionar número:', error);
-        mostrarNotificacao('Erro ao adicionar número. Tente novamente.', 'error');
+        console.error('Erro:', error);
+        mostrarNotificacao('Erro de conexão. Tente novamente.', 'error');
     } finally {
-        toggleLoading(false);
+        esconderLoading();
     }
 }
-
-// Função para verificar saúde da aplicação
-async function verificarSaude() {
-    try {
-        const response = await fetch('/health');
-        const data = await response.json();
-        console.log('Status da aplicação:', data);
-    } catch (error) {
-        console.error('Erro ao verificar saúde da aplicação:', error);
-    }
-}
-
-// Verificar saúde ao carregar a página
-document.addEventListener('DOMContentLoaded', verificarSaude);
