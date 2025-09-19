@@ -39,8 +39,8 @@
             <h2><i class="fas fa-search"></i> Buscar Telefones</h2>
             <p class="search-description">
               <small
-                 >Burger King: códigos 15xxx, 16xxx, 17xxx, 18xxx, 20xxx, 26xxx,
-                 30xxx, 32xxx | Popeyes: PLK + códigos 12xxx, 13xxx, 14xxx</small
+                >Burger King: códigos 15xxx, 16xxx, 17xxx, 18xxx, 20xxx, 26xxx,
+                30xxx, 32xxx | Popeyes: PLK + códigos 12xxx, 13xxx, 14xxx</small
               >
             </p>
 
@@ -63,7 +63,7 @@
                   <div class="tipo-card">
                     <i class="fas fa-drumstick-bite"></i>
                     <span>Popeyes</span>
-                     <small>PLK + 12xxx, 13xxx, 14xxx</small>
+                    <small>PLK + 12xxx, 13xxx, 14xxx</small>
                   </div>
                 </label>
               </div>
@@ -86,6 +86,32 @@
           </div>
         </div>
 
+        <div class="add-number-card">
+          <h3><i class="fas fa-plus-circle"></i> Adicionar Novo Número</h3>
+          <form class="add-number-form" id="addNumberForm">
+            <div class="form-group">
+              <label for="newCode">Código da Loja:</label>
+              <input type="text" id="newCode" placeholder="Ex: 18823" required>
+            </div>
+            <div class="form-group">
+              <label for="newType">Tipo:</label>
+              <select id="newType" required>
+                <option value="">Selecione o tipo</option>
+                <option value="BK">Burger King</option>
+                <option value="PK">Popeyes</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="newPhone">Telefone:</label>
+              <input type="text" id="newPhone" placeholder="Ex: 11999999999" required>
+            </div>
+            <button type="submit" class="add-btn">
+              <i class="fas fa-plus"></i>
+              Adicionar Número
+            </button>
+          </form>
+        </div>
+
         <div class="results-section" id="resultsSection" style="display: none">
           <div class="results-card">
             <div class="results-header">
@@ -94,6 +120,10 @@
                 <button id="exportBtn" class="export-btn">
                   <i class="fas fa-download"></i>
                   Exportar
+                </button>
+                <button id="exportSeparateBtn" class="export-separate-btn">
+                  <i class="fas fa-file-excel"></i>
+                  Exportar Separado
                 </button>
                 <button id="clearBtn" class="clear-btn">
                   <i class="fas fa-trash"></i>
@@ -153,7 +183,7 @@
                   26xxx, 30xxx, 32xxx)</strong
                 >
                 ou
-                 <strong>Popeyes (PLK + códigos 12xxx, 13xxx, 14xxx)</strong>
+                <strong>Popeyes (PLK + códigos 12xxx, 13xxx, 14xxx)</strong>
               </li>
               <li>Digite o código do colaborador que deseja buscar</li>
               <li>Clique em "Buscar" para encontrar os telefones</li>

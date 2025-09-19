@@ -14,17 +14,27 @@ const tipoResultado = document.getElementById('tipoResultado');
 const filterInput = document.getElementById('filterInput');
 const excludeNumbers = document.getElementById('excludeNumbers');
 const exportBtn = document.getElementById('exportBtn');
+const exportSeparateBtn = document.getElementById('exportSeparateBtn');
 const clearBtn = document.getElementById('clearBtn');
 const loadingModal = document.getElementById('loadingModal');
 const notification = document.getElementById('notification');
+
+// Elementos do formulário de adicionar número
+const addNumberForm = document.getElementById('addNumberForm');
+const newCodeInput = document.getElementById('newCode');
+const newTypeSelect = document.getElementById('newType');
+const newPhoneInput = document.getElementById('newPhone');
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
     searchBtn.addEventListener('click', buscarTelefones);
     exportBtn.addEventListener('click', exportarTelefones);
+    exportSeparateBtn.addEventListener('click', exportarTelefonesSeparados);
     clearBtn.addEventListener('click', limparResultados);
     filterInput.addEventListener('input', filtrarTelefones);
     excludeNumbers.addEventListener('change', filtrarTelefones);
+    addNumberForm.addEventListener('submit', adicionarNumero);
+    
     codigoInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             buscarTelefones();
@@ -237,3 +247,92 @@ async function verificarSaude() {
 
 // Verificar saúde ao carregar a página
 document.addEventListener('DOMContentLoaded', verificarSaude);
+
+// Função para exportar telefones separadamente
+async function exportarTelefonesSeparados() {
+    if (telefonesEncontrados.length === 0) {
+        mostrarNotificacao('Nenhum telefone para exportar', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/exportar-separado', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                telefones: telefonesEncontrados,
+                codigo: codigoAtual,
+                tipo_busca: tipoBuscaAtual
+            })
+        });
+        
+        if (response.ok) {
+            // Baixar arquivo
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `telefones_separados_${tipoBuscaAtual}_${codigoAtual}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            mostrarNotificacao('Arquivo separado exportado com sucesso!', 'success');
+        } else {
+            const erro = await response.json();
+            mostrarNotificacao(`Erro na exportação: ${erro.erro}`, 'error');
+        }
+    } catch (error) {
+        console.error('Erro na exportação:', error);
+        mostrarNotificacao('Erro ao exportar arquivo separado', 'error');
+    }
+}
+
+// Função para adicionar novo número
+async function adicionarNumero(event) {
+    event.preventDefault();
+    
+    const codigo = newCodeInput.value.trim();
+    const tipo = newTypeSelect.value;
+    const telefone = newPhoneInput.value.trim();
+    
+    if (!codigo || !tipo || !telefone) {
+        mostrarNotificacao('Todos os campos são obrigatórios', 'error');
+        return;
+    }
+    
+    toggleLoading(true);
+    
+    try {
+        const response = await fetch('/adicionar-numero', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                codigo: codigo,
+                tipo: tipo,
+                telefone: telefone
+            })
+        });
+        
+        const resultado = await response.json();
+        
+        if (resultado.sucesso) {
+            mostrarNotificacao(resultado.mensagem, 'success');
+            // Limpar formulário
+            addNumberForm.reset();
+        } else {
+            mostrarNotificacao(`Erro: ${resultado.erro}`, 'error');
+        }
+        
+    } catch (error) {
+        console.error('Erro ao adicionar número:', error);
+        mostrarNotificacao('Erro ao adicionar número. Tente novamente.', 'error');
+    } finally {
+        toggleLoading(false);
+    }
+}

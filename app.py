@@ -181,6 +181,106 @@ def exportar_telefones():
     except Exception as e:
         return jsonify({'sucesso': False, 'erro': f'Erro na exportação: {str(e)}'})
 
+@app.route('/exportar-separado', methods=['POST'])
+def exportar_telefones_separados():
+    """Exporta cada telefone em uma linha separada para arquivo Excel."""
+    try:
+        dados = request.json
+        telefones = dados.get('telefones', [])
+        codigo = dados.get('codigo', '')
+        tipo_busca = dados.get('tipo_busca', 'BK')
+        
+        if not telefones:
+            return jsonify({'sucesso': False, 'erro': 'Nenhum telefone para exportar'})
+        
+        # Criar DataFrame com cada telefone em uma linha
+        dados_export = []
+        for i, telefone in enumerate(telefones, 1):
+            dados_export.append({
+                'Linha': i,
+                'Código': codigo,
+                'Tipo': tipo_busca,
+                'Telefone': telefone,
+                'Data_Exportacao': pd.Timestamp.now().strftime('%d/%m/%Y %H:%M:%S')
+            })
+        
+        df = pd.DataFrame(dados_export)
+        
+        # Criar arquivo temporário
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, sheet_name='Telefones_Separados', index=False)
+            
+            # Configurar estilo padrão para evitar warnings
+            workbook = writer.book
+            workbook.add_named_style('Default')
+        
+        output.seek(0)
+        
+        # Retornar arquivo
+        return send_file(
+            io.BytesIO(output.read()),
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=f'telefones_separados_{tipo_busca}_{codigo}.xlsx'
+        )
+    
+    except Exception as e:
+        return jsonify({'sucesso': False, 'erro': f'Erro na exportação separada: {str(e)}'})
+
+@app.route('/adicionar-numero', methods=['POST'])
+def adicionar_numero():
+    """Adiciona um novo número ao arquivo Excel."""
+    try:
+        dados = request.json
+        codigo = dados.get('codigo', '').strip()
+        tipo = dados.get('tipo', '').strip()
+        telefone = dados.get('telefone', '').strip()
+        
+        if not all([codigo, tipo, telefone]):
+            return jsonify({'sucesso': False, 'erro': 'Todos os campos são obrigatórios'})
+        
+        if tipo not in ['BK', 'PK']:
+            return jsonify({'sucesso': False, 'erro': 'Tipo inválido'})
+        
+        # Verificar se o arquivo existe
+        if not os.path.exists(EXCEL_FILE):
+            return jsonify({'sucesso': False, 'erro': f'Arquivo {EXCEL_FILE} não encontrado'})
+        
+        # Ler o arquivo Excel
+        df = pd.read_excel(EXCEL_FILE)
+        
+        # Criar nova linha
+        tipo_nome = 'Burger King' if tipo == 'BK' else 'Popeyes'
+        nova_linha = {
+            'Colaborador': f'{codigo} - {tipo_nome}',
+            'Telefone': telefone,
+            'Telefone do solicitante': telefone,
+            'Nome': f'{codigo} - {tipo_nome}',
+            'Nome do solicitante': f'Usuário {tipo_nome}',
+            'Telefone do Gerente': '',
+            'BK/PLK Number': codigo,
+            'Nome completo do contato': f'{tipo_nome} - {codigo}',
+            'Gerente': '',
+            'Telefone comercial': '',
+            'Gerente.1': '',
+            'Telefone comercial.1': ''
+        }
+        
+        # Adicionar nova linha ao DataFrame
+        df = pd.concat([df, pd.DataFrame([nova_linha])], ignore_index=True)
+        
+        # Salvar arquivo
+        df.to_excel(EXCEL_FILE, index=False)
+        
+        return jsonify({
+            'sucesso': True,
+            'mensagem': f'Número {telefone} adicionado com sucesso para {tipo_nome} - {codigo}'
+        })
+    
+    except Exception as e:
+        return jsonify({'sucesso': False, 'erro': f'Erro ao adicionar número: {str(e)}'})
+
 @app.route('/health')
 def health_check():
     """Endpoint para verificar saúde da aplicação."""
