@@ -15,7 +15,6 @@ const notification = document.getElementById('notification');
 const notificationText = document.getElementById('notificationText');
 
 // Filtros
-const filterNome = document.getElementById('filterNome');
 const filterTelefone = document.getElementById('filterTelefone');
 const filterDuplicados = document.getElementById('filterDuplicados');
 
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
     addNumberForm.addEventListener('submit', adicionarNumero);
     
     // Filtros
-    filterNome.addEventListener('input', aplicarFiltros);
     filterTelefone.addEventListener('input', aplicarFiltros);
     filterDuplicados.addEventListener('change', aplicarFiltros);
 });
@@ -115,7 +113,7 @@ function exibirResultados(data) {
     // Atualizar informações
     const tipoResultado = data.tipo_busca === 'BK' ? 'Burger King' : 'Popeyes';
     const totalTelefones = telefonesData.length;
-    const lojasUnicas = [...new Set(telefonesData.map(t => t.nome_loja))].length;
+    const telefonesUnicos = [...new Set(telefonesData)].length;
     
     resultsInfo.innerHTML = `
         <div class="info-card">
@@ -129,9 +127,9 @@ function exibirResultados(data) {
             <div class="info-label">Total de Telefones</div>
         </div>
         <div class="info-card">
-            <i class="fas fa-building"></i>
-            <div class="info-value">${lojasUnicas}</div>
-            <div class="info-label">Lojas Encontradas</div>
+            <i class="fas fa-hashtag"></i>
+            <div class="info-value">${telefonesUnicos}</div>
+            <div class="info-label">Telefones Únicos</div>
         </div>
         <div class="info-card">
             <i class="fas fa-key"></i>
@@ -169,7 +167,7 @@ function exibirTelefones() {
             <div class="telefone-icon">
                 <i class="fas fa-phone"></i>
             </div>
-            <div class="telefone-number">${telefone.telefone}</div>
+            <div class="telefone-number">${telefone}</div>
         </div>
     `).join('');
 }
@@ -178,30 +176,22 @@ function exibirTelefones() {
 function aplicarFiltros() {
     let filtrados = [...telefonesData];
     
-    // Filtro por nome
-    const nomeFiltro = filterNome.value.toLowerCase().trim();
-    if (nomeFiltro) {
-        filtrados = filtrados.filter(t => 
-            t.nome_loja.toLowerCase().includes(nomeFiltro)
-        );
-    }
-    
     // Filtro por telefone
     const telefoneFiltro = filterTelefone.value.trim();
     if (telefoneFiltro) {
-        filtrados = filtrados.filter(t => 
-            t.telefone.includes(telefoneFiltro)
+        filtrados = filtrados.filter(telefone => 
+            telefone.includes(telefoneFiltro)
         );
     }
     
     // Filtro de duplicados
     if (filterDuplicados.checked) {
         const telefonesUnicos = new Set();
-        filtrados = filtrados.filter(t => {
-            if (telefonesUnicos.has(t.telefone)) {
+        filtrados = filtrados.filter(telefone => {
+            if (telefonesUnicos.has(telefone)) {
                 return false;
             }
-            telefonesUnicos.add(t.telefone);
+            telefonesUnicos.add(telefone);
             return true;
         });
     }
@@ -218,7 +208,6 @@ function limparResultados() {
     codigoInput.value = '';
     
     // Limpar filtros
-    filterNome.value = '';
     filterTelefone.value = '';
     filterDuplicados.checked = false;
 }
