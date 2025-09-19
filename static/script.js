@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener('change', function() {
             tipoBuscaAtual = this.value;
             // Atualizar placeholder do input
-            codigoInput.placeholder = 'Digite o código do colaborador';
+            codigoInput.placeholder = 'Digite o PLK Number ou BK Number da loja desejada';
         });
     });
 });
@@ -221,7 +221,7 @@ function limparResultados() {
 
 // Inicializar placeholder
 document.addEventListener('DOMContentLoaded', function() {
-    codigoInput.placeholder = 'Digite o código do colaborador';
+    codigoInput.placeholder = 'Digite o PLK Number ou BK Number da loja desejada';
 });
 
 // Função para verificar saúde da aplicação
