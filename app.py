@@ -40,11 +40,11 @@ def buscar_numeros_telefone_por_codigo(df, codigo, tipo_busca):
         
         # Verificar se o código está presente na coluna Colaborador
         if codigo in colaborador:
-            # Determinar se é OJA ou Popeyes baseado no tipo de busca
+            # Determinar se é Burger King ou Popeyes baseado no tipo de busca
             is_correct_type = False
             
             if tipo_busca == 'BK':
-                # OJA (Burger King): códigos que começam com 15, 18, 20, 22, 30
+                # Burger King: códigos que começam com 15, 18, 20, 22, 30
                 is_correct_type = (
                     colaborador.startswith('15') or
                     colaborador.startswith('18') or
