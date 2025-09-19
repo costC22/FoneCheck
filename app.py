@@ -56,10 +56,11 @@ def buscar_numeros_telefone_por_codigo(df, codigo, tipo_busca):
                     colaborador.startswith('32')
                 )
             else:  # PK
-                # Popeyes: PLK OU códigos que começam com 13, 14
+                # Popeyes: PLK OU códigos que começam com 12, 13, 14
                 colaborador_upper = colaborador.upper()
                 is_correct_type = (
                     'PLK' in colaborador_upper or
+                    colaborador.startswith('12') or
                     colaborador.startswith('13') or
                     colaborador.startswith('14')
                 )
