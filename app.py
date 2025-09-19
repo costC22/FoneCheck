@@ -44,20 +44,20 @@ def buscar_numeros_telefone_por_codigo(df, codigo, tipo_busca):
             is_correct_type = False
             
             if tipo_busca == 'BK':
-                # Burger King: códigos que começam com 15, 18, 20, 22, 30
+                # Burger King: códigos que começam com 15, 16, 17, 18, 20, 30
                 is_correct_type = (
                     colaborador.startswith('15') or
+                    colaborador.startswith('16') or
+                    colaborador.startswith('17') or
                     colaborador.startswith('18') or
                     colaborador.startswith('20') or
-                    colaborador.startswith('22') or
                     colaborador.startswith('30')
                 )
             else:  # PK
-                # Popeyes: PLK OU códigos que começam com 12, 13, 14
+                # Popeyes: PLK OU códigos que começam com 13, 14
                 colaborador_upper = colaborador.upper()
                 is_correct_type = (
                     'PLK' in colaborador_upper or
-                    colaborador.startswith('12') or
                     colaborador.startswith('13') or
                     colaborador.startswith('14')
                 )
@@ -160,6 +160,10 @@ def exportar_telefones():
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             df.to_excel(writer, sheet_name='Telefones', index=False)
+            
+            # Configurar estilo padrão para evitar warnings
+            workbook = writer.book
+            workbook.add_named_style('Default')
         
         output.seek(0)
         
