@@ -124,7 +124,7 @@ def buscar_telefones():
     try:
         dados = request.json
         codigo = dados.get('codigo', '').strip()
-        tipo_busca = dados.get('tipo_busca', 'BK')
+        tipo_busca = dados.get('tipo', 'BK')
         
         if not codigo:
             return jsonify({'sucesso': False, 'erro': 'Código não informado'})
