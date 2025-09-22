@@ -344,3 +344,23 @@ async function adicionarNumero(e) {
         esconderLoading();
     }
 }
+
+// Função para fechar o alerta de atualização
+function dismissAlert() {
+    const alert = document.getElementById('updateAlert');
+    if (alert) {
+        alert.style.animation = 'slideOutUp 0.5s ease-out forwards';
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 500);
+    }
+}
+
+// Função para mostrar o alerta novamente (se necessário)
+function showAlert() {
+    const alert = document.getElementById('updateAlert');
+    if (alert) {
+        alert.style.display = 'block';
+        alert.style.animation = 'slideInDown 0.6s ease-out';
+    }
+}
