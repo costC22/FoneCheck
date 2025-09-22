@@ -1,101 +1,178 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FoneCheck - Sistema de Busca de Telefones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <i class="fas fa-phone-alt"></i>
-                <h1>FoneCheck</h1>
+        <!-- Header Tecnológico -->
+        <header class="tech-header">
+            <div class="header-bg">
+                <div class="tech-grid"></div>
+                <div class="tech-particles"></div>
             </div>
-            <p class="subtitle">Sistema de Busca de Telefones</p>
-            <div class="credits">
-                <small>Desenvolvido por <strong>Angelica Pedroso</strong> e <strong>Bruno Costa</strong></small>
-                <br>
-                <small>Para Zamp - Burger King e Popeyes</small>
-            </div>
-        </header>
+            <div class="header-content">
+                <div class="logo-tech">
+                    <div class="logo-icon">
+          <i class="fas fa-phone-alt"></i>
+                        <div class="logo-pulse"></div>
+                    </div>
+                    <div class="logo-text">
+          <h1>FoneCheck</h1>
+                        <div class="logo-subtitle">Neural Network</div>
+                    </div>
+                </div>
+                <div class="tech-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Marcas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1000+</div>
+                        <div class="stat-label">Contatos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">99.9%</div>
+                        <div class="stat-label">Precisão</div>
+                    </div>
+                </div>
+                <div class="credits-tech">
+                    <small>Desenvolvido por <strong>Angelica Pedroso</strong> e <strong>Bruno Costa</strong></small>
+                    <br>
+                    <small>Para Zamp - Burger King e Popeyes</small>
+        </div>
+        </div>
+      </header>
 
-        <!-- Alerta de Atualização -->
-        <div class="update-alert" id="updateAlert">
-            <div class="alert-content">
-                <div class="alert-icon">
+        <!-- Alerta Tecnológico Responsivo -->
+        <div class="tech-alert" id="updateAlert">
+            <div class="alert-tech-bg">
+                <div class="alert-grid"></div>
+                <div class="alert-scan-line"></div>
+            </div>
+            <div class="alert-tech-content">
+                <div class="alert-tech-icon">
                     <i class="fas fa-clock"></i>
+                    <div class="alert-pulse-ring"></div>
                 </div>
-                <div class="alert-text">
-                    <strong>⚠️ IMPORTANTE:</strong> Os contatos precisam ser atualizados a cada <strong>1 hora</strong> em todos os chamados para garantir informações precisas.
+                <div class="alert-tech-text">
+                    <div class="alert-title">⚠️ ALERTA CRÍTICO</div>
+                    <div class="alert-message">
+                        Os contatos precisam ser atualizados a cada <strong>1 hora</strong> em todos os chamados para garantir informações precisas.
+                    </div>
                 </div>
-                <button class="alert-close" onclick="dismissAlert()" title="Fechar alerta">
+                <button class="alert-tech-close" onclick="dismissAlert()" title="Fechar alerta">
                     <i class="fas fa-times"></i>
+                    <div class="close-pulse"></div>
                 </button>
             </div>
         </div>
 
-        <!-- Dashboard Principal -->
-        <div class="dashboard-container">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="sidebar-header">
-                    <div class="logo-sidebar">
-                        <i class="fas fa-phone-alt"></i>
+        <!-- Dashboard Tecnológico -->
+        <div class="tech-dashboard">
+            <div class="tech-grid-overlay"></div>
+            
+            <!-- Sidebar Tecnológica -->
+            <div class="tech-sidebar">
+                <div class="sidebar-tech-header">
+                    <div class="logo-sidebar-tech">
+                        <div class="sidebar-icon">
+                            <i class="fas fa-phone-alt"></i>
+                            <div class="sidebar-pulse"></div>
+                        </div>
                         <span>FoneCheck</span>
                     </div>
                 </div>
                 
-                <nav class="sidebar-nav">
-                    <a href="#" class="nav-item active" data-section="search">
-                        <i class="fas fa-search"></i>
+                <nav class="tech-nav">
+                    <a href="#" class="tech-nav-item active" data-section="search">
+                        <div class="nav-icon">
+                            <i class="fas fa-search"></i>
+                            <div class="nav-pulse"></div>
+                        </div>
                         <span>Buscar Telefones</span>
+                        <div class="nav-indicator"></div>
                     </a>
-                    <a href="#" class="nav-item" data-section="add">
-                        <i class="fas fa-plus-circle"></i>
+                    <a href="#" class="tech-nav-item" data-section="add">
+                        <div class="nav-icon">
+                            <i class="fas fa-plus-circle"></i>
+                            <div class="nav-pulse"></div>
+                        </div>
                         <span>Adicionar Número</span>
+                        <div class="nav-indicator"></div>
                     </a>
-                    <a href="#" class="nav-item" data-section="help">
-                        <i class="fas fa-question-circle"></i>
+                    <a href="#" class="tech-nav-item" data-section="help">
+                        <div class="nav-icon">
+                            <i class="fas fa-question-circle"></i>
+                            <div class="nav-pulse"></div>
+                        </div>
                         <span>Como Usar</span>
+                        <div class="nav-indicator"></div>
                     </a>
                 </nav>
                 
-                <div class="sidebar-footer">
-                    <div class="quick-stats">
-                        <div class="stat-item">
-                            <i class="fas fa-store"></i>
-                            <span>2 Marcas</span>
+                <div class="tech-sidebar-footer">
+                    <div class="tech-quick-stats">
+                        <div class="tech-stat-item">
+                            <div class="tech-stat-icon">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <div class="tech-stat-info">
+                                <div class="tech-stat-value">2</div>
+                                <div class="tech-stat-label">Marcas</div>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <i class="fas fa-phone"></i>
-                            <span>1000+ Contatos</span>
+                        <div class="tech-stat-item">
+                            <div class="tech-stat-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="tech-stat-info">
+                                <div class="tech-stat-value">1000+</div>
+                                <div class="tech-stat-label">Contatos</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Content Area -->
-            <div class="main-dashboard">
+            <!-- Main Content Area Tecnológica -->
+            <div class="tech-main-dashboard">
+                <div class="tech-content-bg">
+                    <div class="tech-content-grid"></div>
+                    <div class="tech-content-particles"></div>
+                </div>
+                
                 <!-- Search Section -->
                 <div class="dashboard-section active" id="search-section">
-                    <div class="section-header">
-                        <h2>Buscar Telefones</h2>
-                        <p>Encontre números de telefone por código da loja</p>
+                    <div class="tech-section-header">
+                        <div class="section-tech-icon">
+                            <i class="fas fa-search"></i>
+                            <div class="section-pulse"></div>
+                        </div>
+                        <div class="section-tech-text">
+                            <h2>Buscar Telefones</h2>
+                            <p>Neural Network de busca inteligente</p>
+                        </div>
                     </div>
                     
-                    <div class="search-panel">
-                        <div class="search-card">
-                            <div class="search-header">
-                                <div class="search-icon">
+                    <div class="tech-search-panel">
+                        <div class="tech-search-card">
+                            <div class="tech-card-bg">
+                                <div class="card-grid"></div>
+                                <div class="card-scan-line"></div>
+                            </div>
+                            <div class="tech-search-header">
+                                <div class="tech-search-icon">
                                     <i class="fas fa-search"></i>
+                                    <div class="search-pulse-ring"></div>
                                 </div>
-                                <div class="search-info">
-                                    <h3>Busca Inteligente</h3>
-                                    <p>Digite o código da loja para encontrar os telefones</p>
+                                <div class="tech-search-info">
+                                    <h3>Busca Neural</h3>
+                                    <p>Algoritmo de IA para localização precisa</p>
                                 </div>
                             </div>
                             
@@ -114,8 +191,8 @@
                                                     <div class="tipo-info">
                                                         <span class="tipo-name">Burger King</span>
                                                         <span class="tipo-codes">15xxx, 16xxx, 17xxx, 18xxx, 20xxx, 26xxx, 30xxx, 32xxx</span>
-                                                    </div>
-                                                </label>
+                  </div>
+                </label>
                                             </div>
                                             <div class="tipo-option-modern">
                                                 <input type="radio" name="tipoBusca" value="PK" id="tipoPK">
@@ -126,13 +203,13 @@
                                                     <div class="tipo-info">
                                                         <span class="tipo-name">Popeyes</span>
                                                         <span class="tipo-codes">PLK + 12xxx, 13xxx, 14xxx</span>
-                                                    </div>
-                                                </label>
+                  </div>
+                </label>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                
+              </div>
+            </div>
+
                                 <div class="form-step">
                                     <div class="step-number">2</div>
                                     <div class="step-content">
@@ -140,12 +217,12 @@
                                         <div class="input-group-modern">
                                             <div class="input-icon">
                                                 <i class="fas fa-key"></i>
-                                            </div>
+              </div>
                                             <input type="text" id="codigoInput" placeholder="Digite o PLK Number ou BK Number da loja desejada" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                
+            </div>
+          </div>
+        </div>
+
                                 <div class="form-step">
                                     <div class="step-number">3</div>
                                     <div class="step-content">
@@ -290,20 +367,20 @@
                     <i class="fas fa-phone-alt"></i>
                     <h3>Resultados da Busca</h3>
                 </div>
-                <div class="results-actions">
+              <div class="results-actions">
                     <button class="export-btn" id="exportBtn">
-                        <i class="fas fa-download"></i>
-                        Exportar
-                    </button>
+                  <i class="fas fa-download"></i>
+                  Exportar
+                </button>
                     <button class="export-separate-btn" id="exportSeparateBtn">
                         <i class="fas fa-file-export"></i>
                         Exportar Separado
                     </button>
                     <button class="clear-btn" id="clearBtn">
                         <i class="fas fa-times"></i>
-                        Limpar
-                    </button>
-                </div>
+                  Limpar
+                </button>
+              </div>
             </div>
 
             <div class="results-info" id="resultsInfo">
@@ -314,11 +391,11 @@
                     <div class="info-content">
                         <span class="info-label">Tipo de Loja</span>
                         <span class="info-value" id="tipoResultado">-</span>
-                    </div>
-                </div>
+              </div>
+              </div>
                 <div class="info-card">
                     <div class="info-icon">
-                        <i class="fas fa-phone"></i>
+                <i class="fas fa-phone"></i>
                     </div>
                     <div class="info-content">
                         <span class="info-label">Total de Telefones</span>
@@ -342,7 +419,7 @@
                         <span class="info-label">Código Buscado</span>
                         <span class="info-value" id="codigoBuscado">-</span>
                     </div>
-                </div>
+              </div>
             </div>
 
             <div class="filters-section">
@@ -351,22 +428,22 @@
                     Filtros
                 </div>
                 <div class="filters-grid">
-                    <div class="filter-group">
+              <div class="filter-group">
                         <label for="filterTelefone">Filtrar por Telefone</label>
                         <input type="text" id="filterTelefone" placeholder="Digite o telefone">
-                    </div>
-                    <div class="filter-group">
-                        <label>
+              </div>
+              <div class="filter-group">
+                <label>
                             <input type="checkbox" id="filterDuplicados">
                             Ocultar Duplicados
-                        </label>
+                </label>
                     </div>
-                </div>
+              </div>
             </div>
 
             <div class="telefones-grid" id="telefonesGrid">
                 <!-- Telefones serão inseridos aqui via JavaScript -->
-            </div>
+          </div>
         </div>
 
         <!-- Loading Modal -->
@@ -374,7 +451,7 @@
             <div class="loading-content">
                 <div class="loading-spinner"></div>
                 <p id="loadingText">Processando...</p>
-            </div>
+          </div>
         </div>
 
         <!-- Notification -->
@@ -382,10 +459,10 @@
             <div class="notification-content">
                 <i class="notification-icon"></i>
                 <span class="notification-text" id="notificationText"></span>
-            </div>
-        </div>
+    </div>
+      </div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
+  </body>
 </html>
