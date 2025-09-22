@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0066cc 0%, #ff6600 50%, #cc0000 100%);
+    background: linear-gradient(135deg, #0066FF 0%, #FF6600 50%, #CC0000 100%);
     min-height: 100vh;
     color: #1a202c;
     line-height: 1.5;
@@ -147,13 +147,13 @@ body {
 }
 
 .credits strong {
-    color: #0066cc;
+    color: #0066FF;
     font-weight: 700;
 }
 
 /* Alerta de Atualização */
 .update-alert {
-    background: linear-gradient(135deg, #ff6600, #cc0000);
+    background: linear-gradient(135deg, #FF6600, #CC0000);
     border-radius: 12px;
     margin-bottom: 25px;
     box-shadow: 0 8px 20px rgba(255, 102, 0, 0.3);
@@ -270,7 +270,7 @@ body {
     gap: 12px;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #0066cc;
+    color: #0066FF;
 }
 
 .logo-sidebar i {
@@ -314,15 +314,15 @@ body {
 }
 
 .nav-item:hover {
-    background: rgba(0, 102, 204, 0.1);
-    color: #0066cc;
+    background: rgba(0, 102, 255, 0.1);
+    color: #0066FF;
     transform: translateX(5px);
 }
 
 .nav-item.active {
-    background: linear-gradient(135deg, #0066cc, #004499);
+    background: linear-gradient(135deg, #0066FF, #0044CC);
     color: white;
-    box-shadow: 0 5px 15px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
 }
 
 .nav-item i {
@@ -348,9 +348,9 @@ body {
     align-items: center;
     gap: 10px;
     padding: 12px 15px;
-    background: rgba(0, 102, 204, 0.05);
+    background: rgba(0, 102, 255, 0.05);
     border-radius: 10px;
-    color: #0066cc;
+    color: #0066FF;
     font-size: 0.9rem;
     font-weight: 500;
 }
@@ -418,7 +418,7 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #0066cc, #ff6600, #cc0000);
+    background: linear-gradient(90deg, #0066FF, #FF6600, #CC0000);
 }
 
 .search-header {
@@ -433,14 +433,14 @@ body {
 .search-icon {
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #0066cc, #004499);
+    background: linear-gradient(135deg, #0066FF, #0044CC);
     border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 1.8rem;
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
 }
 
 .search-info h3 {
@@ -471,7 +471,7 @@ body {
 .step-number {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #0066cc, #004499);
+    background: linear-gradient(135deg, #0066FF, #0044CC);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -480,7 +480,7 @@ body {
     font-weight: 700;
     font-size: 1.1rem;
     flex-shrink: 0;
-    box-shadow: 0 5px 15px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
 }
 
 .step-content {
@@ -541,22 +541,22 @@ body {
 }
 
 .tipo-card-modern:hover {
-    border-color: #0066cc;
-    background: rgba(0, 102, 204, 0.05);
+    border-color: #0066FF;
+    background: rgba(0, 102, 255, 0.05);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.1);
 }
 
 .tipo-option-modern input[type="radio"]:checked + .tipo-card-modern {
-    border-color: #0066cc;
-    background: rgba(0, 102, 204, 0.1);
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.2);
+    border-color: #0066FF;
+    background: rgba(0, 102, 255, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2);
 }
 
 .tipo-icon {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, #0066cc, #004499);
+    background: linear-gradient(135deg, #0066FF, #0044CC);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -594,7 +594,7 @@ body {
 .input-icon {
     position: absolute;
     left: 15px;
-    color: #0066cc;
+    color: #0066FF;
     font-size: 1.1rem;
     z-index: 1;
 }
@@ -613,9 +613,9 @@ body {
 
 .input-group-modern input:focus {
     outline: none;
-    border-color: #0066cc;
+    border-color: #0066FF;
     background: rgba(255, 255, 255, 1);
-    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
 }
 
 .input-group-modern input::placeholder {
@@ -624,7 +624,7 @@ body {
 
 /* Search Button Modern */
 .search-btn-modern {
-    background: linear-gradient(135deg, #0066cc, #ff6600);
+    background: linear-gradient(135deg, #0066FF, #FF6600);
     color: white;
     border: none;
     padding: 18px 40px;
@@ -633,7 +633,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -661,7 +661,7 @@ body {
 
 .search-btn-modern:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 25px rgba(0, 102, 204, 0.4);
+    box-shadow: 0 12px 25px rgba(0, 102, 255, 0.4);
 }
 
 .search-btn-modern:active {
@@ -706,7 +706,7 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #ff6600, #cc0000);
+    background: linear-gradient(90deg, #FF6600, #CC0000);
 }
 
 .add-header {
@@ -721,7 +721,7 @@ body {
 .add-icon {
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #ff6600, #cc0000);
+    background: linear-gradient(135deg, #FF6600, #CC0000);
     border-radius: 15px;
     display: flex;
     align-items: center;
@@ -777,7 +777,7 @@ body {
 .select-icon {
     position: absolute;
     left: 15px;
-    color: #0066cc;
+    color: #0066FF;
     font-size: 1.1rem;
     z-index: 1;
 }
@@ -797,14 +797,14 @@ body {
 
 .select-group-modern select:focus {
     outline: none;
-    border-color: #0066cc;
+    border-color: #0066FF;
     background: rgba(255, 255, 255, 1);
-    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
 }
 
 /* Add Button Modern */
 .add-btn-modern {
-    background: linear-gradient(135deg, #ff6600, #cc0000);
+    background: linear-gradient(135deg, #FF6600, #CC0000);
     color: white;
     border: none;
     padding: 18px 40px;
@@ -876,7 +876,7 @@ body {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #0066cc, #ff6600, #cc0000);
+    background: linear-gradient(90deg, #0066FF, #FF6600, #CC0000);
 }
 
 .help-card:hover {
@@ -887,7 +887,7 @@ body {
 .help-icon {
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #0066cc, #004499);
+    background: linear-gradient(135deg, #0066FF, #0044CC);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -895,7 +895,7 @@ body {
     color: white;
     font-size: 1.5rem;
     margin: 0 auto 20px;
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
 }
 
 .help-card h3 {
@@ -972,7 +972,7 @@ body {
 
 .results-title i {
     font-size: 1.8rem;
-    color: #0066cc;
+    color: #0066FF;
 }
 
 .results-title h3 {
@@ -1001,18 +1001,18 @@ body {
 }
 
 .export-btn {
-    background: linear-gradient(135deg, #0066cc, #004499);
+    background: linear-gradient(135deg, #0066FF, #0044CC);
     color: white;
-    box-shadow: 0 4px 10px rgba(0, 102, 204, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.2);
 }
 
 .export-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 15px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 6px 15px rgba(0, 102, 255, 0.3);
 }
 
 .export-separate-btn {
-    background: linear-gradient(135deg, #ff6600, #cc0000);
+    background: linear-gradient(135deg, #FF6600, #CC0000);
     color: white;
     box-shadow: 0 4px 10px rgba(255, 102, 0, 0.2);
 }
@@ -1055,7 +1055,7 @@ body {
 .info-icon {
     width: 45px;
     height: 45px;
-    background: linear-gradient(135deg, #0066cc, #004499);
+    background: linear-gradient(135deg, #0066FF, #0044CC);
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -1137,9 +1137,9 @@ body {
 
 .filter-group input:focus {
     outline: none;
-    border-color: #0066cc;
+    border-color: #0066FF;
     background: rgba(255, 255, 255, 1);
-    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
 }
 
 /* Telefones Grid */
@@ -1163,8 +1163,8 @@ body {
 
 .telefone-card:hover {
     transform: translateY(-2px);
-    border-color: rgba(0, 102, 204, 0.3);
-    box-shadow: 0 8px 20px rgba(0, 102, 204, 0.1);
+    border-color: rgba(0, 102, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.1);
 }
 
 .telefone-content {
@@ -1177,14 +1177,14 @@ body {
 .telefone-icon {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #0066cc, #004499);
+    background: linear-gradient(135deg, #0066FF, #0044CC);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 1.1rem;
-    box-shadow: 0 4px 10px rgba(0, 102, 204, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
 }
 
 .telefone-number {
@@ -1255,7 +1255,7 @@ body {
     width: 50px;
     height: 50px;
     border: 4px solid #e2e8f0;
-    border-top: 4px solid #0066cc;
+    border-top: 4px solid #0066FF;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 20px;
@@ -1303,7 +1303,7 @@ body {
 }
 
 .notification.info .notification-icon {
-    color: #0066cc;
+    color: #0066FF;
 }
 
 /* Responsividade */
