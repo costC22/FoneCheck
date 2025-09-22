@@ -164,10 +164,16 @@ function exibirTelefones() {
     
     telefonesGrid.innerHTML = telefonesFiltrados.map(telefone => `
         <div class="telefone-card">
-            <div class="telefone-icon">
-                <i class="fas fa-phone"></i>
+            <div class="telefone-content">
+                <div class="telefone-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="telefone-number">${telefone}</div>
             </div>
-            <div class="telefone-number">${telefone}</div>
+            <a href="https://wa.me/55${telefone}" target="_blank" class="whatsapp-btn" title="Abrir no WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+                <span>WhatsApp</span>
+            </a>
         </div>
     `).join('');
 }
