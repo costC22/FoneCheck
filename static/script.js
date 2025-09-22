@@ -1,16 +1,15 @@
 // Elementos DOM
 const searchForm = document.getElementById('searchForm');
-const searchBtn = document.getElementById('searchBtn');
 const codigoInput = document.getElementById('codigoInput');
-const resultsCard = document.getElementById('resultsCard');
-const resultsInfo = document.getElementById('resultsInfo');
-const telefonesGrid = document.getElementById('telefonesGrid');
-const filtersSection = document.getElementById('filtersSection');
+const searchBtn = document.getElementById('searchBtn');
 const clearBtn = document.getElementById('clearBtn');
 const exportBtn = document.getElementById('exportBtn');
 const exportSeparateBtn = document.getElementById('exportSeparateBtn');
 const addNumberForm = document.getElementById('addNumberForm');
+const resultsCard = document.getElementById('resultsCard');
+const telefonesGrid = document.getElementById('telefonesGrid');
 const loadingModal = document.getElementById('loadingModal');
+const loadingText = document.getElementById('loadingText');
 const notification = document.getElementById('notification');
 const notificationText = document.getElementById('notificationText');
 
@@ -18,16 +17,27 @@ const notificationText = document.getElementById('notificationText');
 const filterTelefone = document.getElementById('filterTelefone');
 const filterDuplicados = document.getElementById('filterDuplicados');
 
-// Dados globais
+// Resultados info
+const tipoResultado = document.getElementById('tipoResultado');
+const totalTelefones = document.getElementById('totalTelefones');
+const telefonesUnicos = document.getElementById('telefonesUnicos');
+const codigoBuscado = document.getElementById('codigoBuscado');
+
+// Dados
 let telefonesData = [];
 let telefonesFiltrados = [];
+let tipoBuscaAtual = 'BK';
+
+// Navigation
+const navItems = document.querySelectorAll('.nav-item');
+const sections = document.querySelectorAll('.dashboard-section');
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
     // Placeholder do input
     codigoInput.placeholder = "Digite o PLK Number ou BK Number da loja desejada";
     
-    // Event listeners
+    // Event listeners principais
     searchForm.addEventListener('submit', buscarTelefones);
     clearBtn.addEventListener('click', limparResultados);
     exportBtn.addEventListener('click', exportarTelefones);
@@ -37,11 +47,48 @@ document.addEventListener('DOMContentLoaded', function() {
     // Filtros
     filterTelefone.addEventListener('input', aplicarFiltros);
     filterDuplicados.addEventListener('change', aplicarFiltros);
+    
+    // Navegação
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = item.getAttribute('data-section');
+            navigateToSection(section);
+        });
+    });
+    
+    // Tipo de busca
+    document.querySelectorAll('input[name="tipoBusca"]').forEach(input => {
+        input.addEventListener('change', function() {
+            tipoBuscaAtual = this.value;
+        });
+    });
 });
+
+// Função de navegação
+function navigateToSection(sectionName) {
+    // Remove active de todos os nav items
+    navItems.forEach(item => item.classList.remove('active'));
+    
+    // Adiciona active ao item clicado
+    const activeNavItem = document.querySelector(`[data-section="${sectionName}"]`);
+    if (activeNavItem) {
+        activeNavItem.classList.add('active');
+    }
+    
+    // Remove active de todas as seções
+    sections.forEach(section => section.classList.remove('active'));
+    
+    // Adiciona active à seção correspondente
+    const activeSection = document.getElementById(`${sectionName}-section`);
+    if (activeSection) {
+        activeSection.classList.add('active');
+    }
+}
 
 // Função para mostrar loading
 function mostrarLoading() {
-    loadingModal.style.display = 'block';
+    loadingModal.style.display = 'flex';
 }
 
 // Função para esconder loading
@@ -65,14 +112,13 @@ async function buscarTelefones(e) {
     e.preventDefault();
     
     const codigo = codigoInput.value.trim();
-    const tipoBusca = document.querySelector('input[name="tipoBusca"]:checked').value;
-    
     if (!codigo) {
-        mostrarNotificacao('Por favor, digite um código válido', 'error');
+        mostrarNotificacao('Por favor, digite um código de loja', 'error');
         return;
     }
     
     mostrarLoading();
+    loadingText.textContent = 'Buscando telefones...';
     
     try {
         const response = await fetch('/buscar', {
@@ -82,7 +128,7 @@ async function buscarTelefones(e) {
             },
             body: JSON.stringify({
                 codigo: codigo,
-                tipo_busca: tipoBusca
+                tipo: tipoBuscaAtual
             })
         });
         
@@ -92,10 +138,14 @@ async function buscarTelefones(e) {
             telefonesData = data.telefones || [];
             telefonesFiltrados = [...telefonesData];
             
-            exibirResultados(data);
+            exibirResultados(codigo, data.telefones || []);
+            aplicarFiltros();
+            
             mostrarNotificacao(`Encontrados ${telefonesData.length} telefones!`, 'success');
         } else {
-            mostrarNotificacao(data.erro || 'Erro ao buscar telefones', 'error');
+            mostrarNotificacao(data.erro || 'Nenhum telefone encontrado', 'error');
+            telefonesData = [];
+            telefonesFiltrados = [];
         }
     } catch (error) {
         console.error('Erro:', error);
@@ -106,47 +156,17 @@ async function buscarTelefones(e) {
 }
 
 // Função para exibir resultados
-function exibirResultados(data) {
-    // Mostrar card de resultados
+function exibirResultados(codigo, telefones) {
+    tipoResultado.textContent = `${tipoBuscaAtual} (${tipoBuscaAtual === 'BK' ? 'Burger King' : 'Popeyes'})`;
+    totalTelefones.textContent = telefones.length;
+    
+    // Contar telefones únicos
+    const telefonesUnicosSet = new Set(telefones);
+    telefonesUnicos.textContent = telefonesUnicosSet.size;
+    
+    codigoBuscado.textContent = codigo;
+    
     resultsCard.style.display = 'block';
-    
-    // Atualizar informações
-    const tipoResultado = data.tipo_busca === 'BK' ? 'Burger King' : 'Popeyes';
-    const totalTelefones = telefonesData.length;
-    const telefonesUnicos = [...new Set(telefonesData)].length;
-    
-    resultsInfo.innerHTML = `
-        <div class="info-card">
-            <i class="fas fa-store"></i>
-            <div class="info-value">${tipoResultado}</div>
-            <div class="info-label">Tipo de Loja</div>
-        </div>
-        <div class="info-card">
-            <i class="fas fa-phone"></i>
-            <div class="info-value">${totalTelefones}</div>
-            <div class="info-label">Total de Telefones</div>
-        </div>
-        <div class="info-card">
-            <i class="fas fa-hashtag"></i>
-            <div class="info-value">${telefonesUnicos}</div>
-            <div class="info-label">Telefones Únicos</div>
-        </div>
-        <div class="info-card">
-            <i class="fas fa-key"></i>
-            <div class="info-value">${data.codigo}</div>
-            <div class="info-label">Código Buscado</div>
-        </div>
-    `;
-    
-    // Mostrar seção de filtros se houver telefones
-    if (totalTelefones > 0) {
-        filtersSection.style.display = 'block';
-    }
-    
-    // Exibir telefones
-    exibirTelefones();
-    
-    // Scroll para resultados
     resultsCard.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -182,7 +202,6 @@ function exibirTelefones() {
 function aplicarFiltros() {
     let filtrados = [...telefonesData];
     
-    // Filtro por telefone
     const telefoneFiltro = filterTelefone.value.trim();
     if (telefoneFiltro) {
         filtrados = filtrados.filter(telefone => 
@@ -190,7 +209,6 @@ function aplicarFiltros() {
         );
     }
     
-    // Filtro de duplicados
     if (filterDuplicados.checked) {
         const telefonesUnicos = new Set();
         filtrados = filtrados.filter(telefone => {
@@ -226,6 +244,7 @@ async function exportarTelefones() {
     }
     
     mostrarLoading();
+    loadingText.textContent = 'Exportando telefones...';
     
     try {
         const response = await fetch('/exportar', {
@@ -270,6 +289,7 @@ async function exportarTelefonesSeparados() {
     }
     
     mostrarLoading();
+    loadingText.textContent = 'Exportando telefones separados...';
     
     try {
         const response = await fetch('/exportar-separado', {
@@ -287,13 +307,13 @@ async function exportarTelefonesSeparados() {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'telefones_detalhado.xlsx';
+            a.download = 'telefones_separados.xlsx';
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
             
-            mostrarNotificacao('Arquivo detalhado exportado com sucesso!', 'success');
+            mostrarNotificacao('Arquivo exportado com sucesso!', 'success');
         } else {
             const data = await response.json();
             mostrarNotificacao(data.erro || 'Erro ao exportar arquivo', 'error');
@@ -312,13 +332,18 @@ async function adicionarNumero(e) {
     
     const formData = new FormData(addNumberForm);
     const dados = {
-        tipo: formData.get('tipo'),
-        codigo: formData.get('codigo'),
-        nome: formData.get('nome'),
-        telefone: formData.get('telefone')
+        codigo: formData.get('newCode'),
+        tipo: formData.get('newType'),
+        telefone: formData.get('newPhone')
     };
     
+    if (!dados.codigo || !dados.tipo || !dados.telefone) {
+        mostrarNotificacao('Por favor, preencha todos os campos', 'error');
+        return;
+    }
+    
     mostrarLoading();
+    loadingText.textContent = 'Adicionando número...';
     
     try {
         const response = await fetch('/adicionar-numero', {
