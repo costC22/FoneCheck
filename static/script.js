@@ -1,111 +1,48 @@
-// Elementos DOM
+// Elementos do DOM
 const searchForm = document.getElementById('searchForm');
 const codigoInput = document.getElementById('codigoInput');
 const searchBtn = document.getElementById('searchBtn');
-const clearBtn = document.getElementById('clearBtn');
-const exportBtn = document.getElementById('exportBtn');
-const exportSeparateBtn = document.getElementById('exportSeparateBtn');
-const addNumberForm = document.getElementById('addNumberForm');
-const resultsCard = document.getElementById('resultsCard');
+const tipoBuscaInputs = document.querySelectorAll('input[name="tipoBusca"]');
+const resultsSection = document.getElementById('resultsSection');
 const telefonesGrid = document.getElementById('telefonesGrid');
 const loadingModal = document.getElementById('loadingModal');
-const loadingText = document.getElementById('loadingText');
 const notification = document.getElementById('notification');
-const notificationText = document.getElementById('notificationText');
-
-// Filtros
+const addNumberForm = document.getElementById('addNumberForm');
+const exportBtn = document.getElementById('exportBtn');
+const exportSeparateBtn = document.getElementById('exportSeparateBtn');
 const filterTelefone = document.getElementById('filterTelefone');
 const filterDuplicados = document.getElementById('filterDuplicados');
 
-// Resultados info
-const tipoResultado = document.getElementById('tipoResultado');
-const totalTelefones = document.getElementById('totalTelefones');
-const telefonesUnicos = document.getElementById('telefonesUnicos');
-const codigoBuscado = document.getElementById('codigoBuscado');
-
-// Dados
+// Variáveis globais
 let telefonesData = [];
 let telefonesFiltrados = [];
 let tipoBuscaAtual = 'BK';
 
-// Navigation
-const navItems = document.querySelectorAll('.nav-item');
-const sections = document.querySelectorAll('.dashboard-section');
-
-// Event Listeners
+// Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-    // Placeholder do input
-    codigoInput.placeholder = "Digite o PLK Number ou BK Number da loja desejada";
-    
-    // Event listeners principais
+    // Event listeners
     searchForm.addEventListener('submit', buscarTelefones);
-    clearBtn.addEventListener('click', limparResultados);
+    addNumberForm.addEventListener('submit', adicionarNumero);
     exportBtn.addEventListener('click', exportarTelefones);
     exportSeparateBtn.addEventListener('click', exportarTelefonesSeparados);
-    addNumberForm.addEventListener('submit', adicionarNumero);
     
     // Filtros
     filterTelefone.addEventListener('input', aplicarFiltros);
     filterDuplicados.addEventListener('change', aplicarFiltros);
     
-    // Navegação
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const section = item.getAttribute('data-section');
-            navigateToSection(section);
-        });
-    });
-    
     // Tipo de busca
-    document.querySelectorAll('input[name="tipoBusca"]').forEach(input => {
+    tipoBuscaInputs.forEach(input => {
         input.addEventListener('change', function() {
             tipoBuscaAtual = this.value;
+            codigoInput.placeholder = tipoBuscaAtual === 'BK' 
+                ? 'Digite o BK Number da loja desejada'
+                : 'Digite o PLK Number da loja desejada';
         });
     });
+    
+    // Placeholder inicial
+    codigoInput.placeholder = 'Digite o BK Number da loja desejada';
 });
-
-// Função de navegação
-function navigateToSection(sectionName) {
-    // Remove active de todos os nav items
-    navItems.forEach(item => item.classList.remove('active'));
-    
-    // Adiciona active ao item clicado
-    const activeNavItem = document.querySelector(`[data-section="${sectionName}"]`);
-    if (activeNavItem) {
-        activeNavItem.classList.add('active');
-    }
-    
-    // Remove active de todas as seções
-    sections.forEach(section => section.classList.remove('active'));
-    
-    // Adiciona active à seção correspondente
-    const activeSection = document.getElementById(`${sectionName}-section`);
-    if (activeSection) {
-        activeSection.classList.add('active');
-    }
-}
-
-// Função para mostrar loading
-function mostrarLoading() {
-    loadingModal.style.display = 'flex';
-}
-
-// Função para esconder loading
-function esconderLoading() {
-    loadingModal.style.display = 'none';
-}
-
-// Função para mostrar notificação
-function mostrarNotificacao(texto, tipo = 'info') {
-    notificationText.textContent = texto;
-    notification.className = `notification ${tipo}`;
-    notification.classList.add('show');
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
-}
 
 // Função para buscar telefones
 async function buscarTelefones(e) {
@@ -113,12 +50,11 @@ async function buscarTelefones(e) {
     
     const codigo = codigoInput.value.trim();
     if (!codigo) {
-        mostrarNotificacao('Por favor, digite um código de loja', 'error');
+        mostrarNotificacao('Por favor, digite um código válido', 'error');
         return;
     }
     
-    mostrarLoading();
-    loadingText.textContent = 'Buscando telefones...';
+    mostrarLoading(true);
     
     try {
         const response = await fetch('/buscar', {
@@ -137,44 +73,43 @@ async function buscarTelefones(e) {
         if (data.sucesso) {
             telefonesData = data.telefones || [];
             telefonesFiltrados = [...telefonesData];
-            
-            exibirResultados(codigo, data.telefones || []);
-            aplicarFiltros();
-            
-            mostrarNotificacao(`Encontrados ${telefonesData.length} telefones!`, 'success');
+            exibirResultados(data, codigo);
+            mostrarNotificacao(`${telefonesData.length} telefone(s) encontrado(s)`, 'success');
         } else {
             mostrarNotificacao(data.erro || 'Nenhum telefone encontrado', 'error');
-            telefonesData = [];
-            telefonesFiltrados = [];
+            limparResultados();
         }
     } catch (error) {
-        console.error('Erro:', error);
-        mostrarNotificacao('Erro de conexão. Tente novamente.', 'error');
+        console.error('Erro na busca:', error);
+        mostrarNotificacao('Erro ao buscar telefones. Tente novamente.', 'error');
     } finally {
-        esconderLoading();
+        mostrarLoading(false);
     }
 }
 
 // Função para exibir resultados
-function exibirResultados(codigo, telefones) {
-    tipoResultado.textContent = `${tipoBuscaAtual} (${tipoBuscaAtual === 'BK' ? 'Burger King' : 'Popeyes'})`;
-    totalTelefones.textContent = telefones.length;
+function exibirResultados(data, codigo) {
+    // Atualizar informações do resumo
+    document.getElementById('tipoResultado').textContent = `${tipoBuscaAtual} (${tipoBuscaAtual === 'BK' ? 'Burger King' : 'Popeyes'})`;
+    document.getElementById('totalTelefones').textContent = telefonesData.length;
+    document.getElementById('telefonesUnicos').textContent = telefonesData.length;
+    document.getElementById('codigoBuscado').textContent = codigo;
     
-    // Contar telefones únicos
-    const telefonesUnicosSet = new Set(telefones);
-    telefonesUnicos.textContent = telefonesUnicosSet.size;
+    // Mostrar seção de resultados
+    resultsSection.style.display = 'block';
     
-    codigoBuscado.textContent = codigo;
+    // Aplicar filtros e exibir telefones
+    aplicarFiltros();
     
-    resultsCard.style.display = 'block';
-    resultsCard.scrollIntoView({ behavior: 'smooth' });
+    // Scroll para resultados
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
 
 // Função para exibir telefones
 function exibirTelefones() {
     if (telefonesFiltrados.length === 0) {
         telefonesGrid.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #718096;">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
                 <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
                 <p>Nenhum telefone encontrado com os filtros aplicados.</p>
             </div>
@@ -222,108 +157,19 @@ function aplicarFiltros() {
     
     telefonesFiltrados = filtrados;
     exibirTelefones();
+    
+    // Atualizar contadores
+    document.getElementById('telefonesUnicos').textContent = telefonesFiltrados.length;
 }
 
 // Função para limpar resultados
 function limparResultados() {
-    resultsCard.style.display = 'none';
+    resultsSection.style.display = 'none';
     telefonesData = [];
     telefonesFiltrados = [];
     codigoInput.value = '';
-    
-    // Limpar filtros
     filterTelefone.value = '';
     filterDuplicados.checked = false;
-}
-
-// Função para exportar telefones
-async function exportarTelefones() {
-    if (telefonesData.length === 0) {
-        mostrarNotificacao('Nenhum telefone para exportar', 'error');
-        return;
-    }
-    
-    mostrarLoading();
-    loadingText.textContent = 'Exportando telefones...';
-    
-    try {
-        const response = await fetch('/exportar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                telefones: telefonesData
-            })
-        });
-        
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'telefones_busca.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-            
-            mostrarNotificacao('Arquivo exportado com sucesso!', 'success');
-        } else {
-            const data = await response.json();
-            mostrarNotificacao(data.erro || 'Erro ao exportar arquivo', 'error');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-        mostrarNotificacao('Erro de conexão. Tente novamente.', 'error');
-    } finally {
-        esconderLoading();
-    }
-}
-
-// Função para exportar telefones separados
-async function exportarTelefonesSeparados() {
-    if (telefonesData.length === 0) {
-        mostrarNotificacao('Nenhum telefone para exportar', 'error');
-        return;
-    }
-    
-    mostrarLoading();
-    loadingText.textContent = 'Exportando telefones separados...';
-    
-    try {
-        const response = await fetch('/exportar-separado', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                telefones: telefonesData
-            })
-        });
-        
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'telefones_separados.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-            
-            mostrarNotificacao('Arquivo exportado com sucesso!', 'success');
-        } else {
-            const data = await response.json();
-            mostrarNotificacao(data.erro || 'Erro ao exportar arquivo', 'error');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-        mostrarNotificacao('Erro de conexão. Tente novamente.', 'error');
-    } finally {
-        esconderLoading();
-    }
 }
 
 // Função para adicionar número
@@ -334,16 +180,16 @@ async function adicionarNumero(e) {
     const dados = {
         codigo: formData.get('newCode'),
         tipo: formData.get('newType'),
+        nome: formData.get('newStoreName'),
         telefone: formData.get('newPhone')
     };
     
     if (!dados.codigo || !dados.tipo || !dados.telefone) {
-        mostrarNotificacao('Por favor, preencha todos os campos', 'error');
+        mostrarNotificacao('Por favor, preencha todos os campos obrigatórios', 'error');
         return;
     }
     
-    mostrarLoading();
-    loadingText.textContent = 'Adicionando número...';
+    mostrarLoading(true);
     
     try {
         const response = await fetch('/adicionar-numero', {
@@ -363,11 +209,138 @@ async function adicionarNumero(e) {
             mostrarNotificacao(data.erro || 'Erro ao adicionar número', 'error');
         }
     } catch (error) {
-        console.error('Erro:', error);
-        mostrarNotificacao('Erro de conexão. Tente novamente.', 'error');
+        console.error('Erro ao adicionar número:', error);
+        mostrarNotificacao('Erro ao adicionar número. Tente novamente.', 'error');
     } finally {
-        esconderLoading();
+        mostrarLoading(false);
     }
+}
+
+// Função para exportar telefones
+async function exportarTelefones() {
+    if (telefonesData.length === 0) {
+        mostrarNotificacao('Nenhum telefone para exportar', 'error');
+        return;
+    }
+    
+    mostrarLoading(true);
+    
+    try {
+        const response = await fetch('/exportar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                telefones: telefonesData,
+                tipo: tipoBuscaAtual
+            })
+        });
+        
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `telefones_${tipoBuscaAtual}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            mostrarNotificacao('Arquivo exportado com sucesso!', 'success');
+        } else {
+            mostrarNotificacao('Erro ao exportar arquivo', 'error');
+        }
+    } catch (error) {
+        console.error('Erro na exportação:', error);
+        mostrarNotificacao('Erro ao exportar arquivo', 'error');
+    } finally {
+        mostrarLoading(false);
+    }
+}
+
+// Função para exportar telefones separados
+async function exportarTelefonesSeparados() {
+    if (telefonesData.length === 0) {
+        mostrarNotificacao('Nenhum telefone para exportar', 'error');
+        return;
+    }
+    
+    mostrarLoading(true);
+    
+    try {
+        const response = await fetch('/exportar-separado', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                telefones: telefonesData,
+                tipo: tipoBuscaAtual
+            })
+        });
+        
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `telefones_separados_${tipoBuscaAtual}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            mostrarNotificacao('Arquivo exportado com sucesso!', 'success');
+        } else {
+            mostrarNotificacao('Erro ao exportar arquivo', 'error');
+        }
+    } catch (error) {
+        console.error('Erro na exportação:', error);
+        mostrarNotificacao('Erro ao exportar arquivo', 'error');
+    } finally {
+        mostrarLoading(false);
+    }
+}
+
+// Função para mostrar/esconder loading
+function mostrarLoading(mostrar) {
+    if (mostrar) {
+        loadingModal.style.display = 'flex';
+    } else {
+        loadingModal.style.display = 'none';
+    }
+}
+
+// Função para mostrar notificação
+function mostrarNotificacao(mensagem, tipo = 'success') {
+    const notificationMessage = document.getElementById('notificationMessage');
+    const notificationIcon = notification.querySelector('.notification-icon i');
+    
+    notificationMessage.textContent = mensagem;
+    
+    // Remove classes anteriores
+    notification.classList.remove('show', 'success', 'error', 'info');
+    
+    // Adiciona classe do tipo
+    notification.classList.add('show', tipo);
+    
+    // Muda o ícone baseado no tipo
+    switch (tipo) {
+        case 'success':
+            notificationIcon.className = 'fas fa-check';
+            break;
+        case 'error':
+            notificationIcon.className = 'fas fa-times';
+            break;
+        case 'info':
+            notificationIcon.className = 'fas fa-info';
+            break;
+    }
+    
+    // Remove a notificação após 4 segundos
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 4000);
 }
 
 // Função para fechar o alerta de atualização
