@@ -332,4 +332,7 @@ def health_check():
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
+    print(f"🚀 Iniciando FoneCheck na porta {port}")
+    print(f"📁 Diretório de trabalho: {os.getcwd()}")
+    print(f"📊 Arquivo Excel existe: {os.path.exists(EXCEL_FILE)}")
     app.run(debug=False, host='0.0.0.0', port=port)
