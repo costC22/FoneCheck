@@ -470,10 +470,13 @@ async function openWhatsApp() {
     const motivoFinal = reason === 'Outro' ? customReason : reason;
     
     // Criar mensagem formatada
-    const mensagem = `Olá! Me chamo ${userName} e estou entrando em contato sobre ${motivoFinal} da loja ${tipoLojaAtual} número ${codigoLojaAtual}.`;
+    const mensagem = `Ola! Me chamo ${userName} e estou entrando em contato sobre ${motivoFinal} da loja ${tipoLojaAtual} numero ${codigoLojaAtual}.`;
+    
+    console.log('Mensagem criada:', mensagem);
     
     // Codificar mensagem para URL
     const mensagemEncoded = encodeURIComponent(mensagem);
+    console.log('Mensagem codificada:', mensagemEncoded);
     
     // Salvar log antes de abrir WhatsApp
     try {
@@ -483,15 +486,28 @@ async function openWhatsApp() {
         // Continuar mesmo se o log falhar
     }
     
-    // Abrir WhatsApp
-    const whatsappUrl = `https://wa.me/55${telefoneAtual}?text=${mensagemEncoded}`;
-    window.open(whatsappUrl, '_blank');
+    // Limpar telefone (remover caracteres especiais)
+    const telefoneLimpo = telefoneAtual.replace(/[^\d]/g, '');
+    console.log('Telefone original:', telefoneAtual);
+    console.log('Telefone limpo:', telefoneLimpo);
     
-    // Fechar modal
-    closeWhatsAppModal();
+    // Abrir WhatsApp
+    const whatsappUrl = `https://wa.me/55${telefoneLimpo}?text=${mensagemEncoded}`;
+    console.log('URL do WhatsApp:', whatsappUrl);
+    
+    // Testar se a URL está correta
+    console.log('Testando URL:', whatsappUrl);
+    
+    // Abrir WhatsApp
+    window.open(whatsappUrl, '_blank');
     
     // Mostrar notificação de sucesso
     mostrarNotificacao('WhatsApp aberto com sucesso!', 'success');
+    
+    // Fechar modal após um pequeno delay
+    setTimeout(() => {
+        closeWhatsAppModal();
+    }, 500);
 }
 
 // Função para salvar log do WhatsApp
