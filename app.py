@@ -173,10 +173,6 @@ def exportar_telefones():
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             df.to_excel(writer, sheet_name='Telefones', index=False)
-            
-            # Configurar estilo padrão para evitar warnings
-            workbook = writer.book
-            workbook.add_named_style('Default')
         
         output.seek(0)
         
@@ -220,10 +216,6 @@ def exportar_telefones_separados():
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             df.to_excel(writer, sheet_name='Telefones_Separados', index=False)
-            
-            # Configurar estilo padrão para evitar warnings
-            workbook = writer.book
-            workbook.add_named_style('Default')
         
         output.seek(0)
         
