@@ -17,6 +17,7 @@ const filterDuplicados = document.getElementById('filterDuplicados');
 let telefonesData = [];
 let telefonesFiltrados = [];
 let tipoBuscaAtual = 'BK';
+let codigoBuscadoAtual = '';
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
@@ -73,6 +74,7 @@ async function buscarTelefones(e) {
         if (data.sucesso) {
             telefonesData = data.telefones || [];
             telefonesFiltrados = [...telefonesData];
+            codigoBuscadoAtual = codigo;
             exibirResultados(data, codigo);
             mostrarNotificacao(`${telefonesData.length} telefone(s) encontrado(s)`, 'success');
         } else {
@@ -125,7 +127,7 @@ function exibirTelefones() {
                 </div>
                 <div class="telefone-number">${telefone}</div>
             </div>
-            <button onclick="openWhatsAppModal('${telefone}')" class="whatsapp-btn" title="Abrir no WhatsApp">
+            <button onclick="console.log('Botão clicado:', '${telefone}'); openWhatsAppModal('${telefone}')" class="whatsapp-btn" title="Abrir no WhatsApp">
                 <i class="fab fa-whatsapp"></i>
                 <span>WhatsApp</span>
             </button>
@@ -370,24 +372,42 @@ let tipoLojaAtual = '';
 
 // Função para abrir o modal do WhatsApp
 function openWhatsAppModal(telefone) {
+    console.log('openWhatsAppModal chamada com:', telefone);
+    
     telefoneAtual = telefone;
     codigoLojaAtual = codigoBuscadoAtual || '';
     tipoLojaAtual = tipoBuscaAtual || '';
     
+    console.log('Dados:', { telefoneAtual, codigoLojaAtual, tipoLojaAtual });
+    
     // Preencher dados no modal
-    document.getElementById('phoneNumber').textContent = telefone;
-    document.getElementById('storeCode').textContent = `${tipoLojaAtual} - ${codigoLojaAtual}`;
+    const phoneElement = document.getElementById('phoneNumber');
+    const storeElement = document.getElementById('storeCode');
+    
+    if (phoneElement) phoneElement.textContent = telefone;
+    if (storeElement) storeElement.textContent = `${tipoLojaAtual} - ${codigoLojaAtual}`;
     
     // Limpar formulário
-    document.getElementById('whatsappForm').reset();
-    document.getElementById('customReasonGroup').style.display = 'none';
+    const form = document.getElementById('whatsappForm');
+    const customReasonGroup = document.getElementById('customReasonGroup');
+    
+    if (form) form.reset();
+    if (customReasonGroup) customReasonGroup.style.display = 'none';
     
     // Mostrar modal
-    document.getElementById('whatsappModal').style.display = 'flex';
+    const modal = document.getElementById('whatsappModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        console.log('Modal exibido');
+        console.log('Modal style:', modal.style.display);
+    } else {
+        console.error('Modal não encontrado');
+    }
     
     // Focar no primeiro campo
     setTimeout(() => {
-        document.getElementById('userName').focus();
+        const userNameField = document.getElementById('userName');
+        if (userNameField) userNameField.focus();
     }, 100);
 }
 
