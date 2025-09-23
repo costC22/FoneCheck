@@ -127,7 +127,7 @@ function exibirTelefones() {
                 </div>
                 <div class="telefone-number">${telefone}</div>
             </div>
-            <button onclick="console.log('Botão clicado:', '${telefone}'); openWhatsAppModal('${telefone}')" class="whatsapp-btn" title="Abrir no WhatsApp">
+            <button onclick="openWhatsAppDirect('${telefone}')" class="whatsapp-btn" title="Abrir no WhatsApp">
                 <i class="fab fa-whatsapp"></i>
                 <span>WhatsApp</span>
             </button>
@@ -371,53 +371,36 @@ let codigoLojaAtual = '';
 let tipoLojaAtual = '';
 
 // Função para abrir o modal do WhatsApp
-function openWhatsAppModal(telefone) {
-    console.log('openWhatsAppModal chamada com:', telefone);
+function openWhatsAppDirect(telefone) {
+    console.log('=== ABRINDO WHATSAPP DIRETO ===');
+    console.log('Telefone:', telefone);
     
-    telefoneAtual = telefone;
-    codigoLojaAtual = codigoBuscadoAtual || '';
-    tipoLojaAtual = tipoBuscaAtual || '';
+    // Limpar telefone (apenas dígitos)
+    const telefoneLimpo = telefone.replace(/[^\d]/g, '');
+    console.log('Telefone limpo:', telefoneLimpo);
     
-    console.log('Dados:', { telefoneAtual, codigoLojaAtual, tipoLojaAtual });
-    
-    // Preencher dados no modal
-    const phoneElement = document.getElementById('phoneNumber');
-    const storeElement = document.getElementById('storeCode');
-    
-    if (phoneElement) phoneElement.textContent = telefone;
-    if (storeElement) storeElement.textContent = `${tipoLojaAtual} - ${codigoLojaAtual}`;
-    
-    // Limpar formulário
-    const form = document.getElementById('whatsappForm');
-    const customReasonGroup = document.getElementById('customReasonGroup');
-    
-    if (form) form.reset();
-    if (customReasonGroup) customReasonGroup.style.display = 'none';
-    
-    // Mostrar modal
-    const modal = document.getElementById('whatsappModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        console.log('Modal exibido');
-        console.log('Modal style:', modal.style.display);
-    } else {
-        console.error('Modal não encontrado');
+    // Validar telefone
+    if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
+        console.error('Telefone com tamanho inválido:', telefoneLimpo.length);
+        mostrarNotificacao('Número de telefone inválido', 'error');
+        return;
     }
     
-    // Focar no primeiro campo
-    setTimeout(() => {
-        const userNameField = document.getElementById('userName');
-        if (userNameField) userNameField.focus();
-    }, 100);
+    // Criar URL do WhatsApp
+    const whatsappUrl = `https://wa.me/55${telefoneLimpo}`;
+    console.log('URL do WhatsApp:', whatsappUrl);
+    
+    // Abrir WhatsApp
+    try {
+        window.open(whatsappUrl, '_blank');
+        console.log('WhatsApp aberto com sucesso!');
+        mostrarNotificacao('WhatsApp aberto com sucesso!', 'success');
+    } catch (error) {
+        console.error('Erro ao abrir WhatsApp:', error);
+        mostrarNotificacao('Erro ao abrir WhatsApp: ' + error.message, 'error');
+    }
 }
 
-// Função para fechar o modal do WhatsApp
-function closeWhatsAppModal() {
-    document.getElementById('whatsappModal').style.display = 'none';
-    telefoneAtual = '';
-    codigoLojaAtual = '';
-    tipoLojaAtual = '';
-}
 
 // Função para mostrar/ocultar campo de motivo customizado
 document.addEventListener('DOMContentLoaded', function() {
@@ -437,149 +420,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Fechar modal ao clicar fora dele
-    const modal = document.getElementById('whatsappModal');
-    if (modal) {
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeWhatsAppModal();
-            }
-        });
-    }
 });
 
-// Função para abrir o WhatsApp com mensagem formatada
-async function openWhatsApp() {
-    console.log('=== INICIANDO openWhatsApp ===');
-    
-    const form = document.getElementById('whatsappForm');
-    if (!form) {
-        console.error('Formulário WhatsApp não encontrado!');
-        mostrarNotificacao('Erro: Formulário não encontrado', 'error');
-        return;
-    }
-    
-    const formData = new FormData(form);
-    console.log('Formulário encontrado e dados capturados');
-    
-    const userName = formData.get('userName');
-    const reason = formData.get('reason');
-    const customReason = formData.get('customReason');
-    
-    console.log('Dados capturados:', { userName, reason, customReason });
-    
-    if (!userName || !reason) {
-        console.error('Campos obrigatórios não preenchidos');
-        mostrarNotificacao('Por favor, preencha todos os campos obrigatórios', 'error');
-        return;
-    }
-    
-    if (reason === 'Outro' && !customReason) {
-        mostrarNotificacao('Por favor, especifique o motivo', 'error');
-        return;
-    }
-    
-    const motivoFinal = reason === 'Outro' ? customReason : reason;
-    
-    // Criar mensagem formatada simples
-    const mensagem = `Ola! Me chamo ${userName} e estou entrando em contato sobre ${motivoFinal} da loja ${tipoLojaAtual} numero ${codigoLojaAtual}.`;
-    
-    console.log('Mensagem criada:', mensagem);
-    
-    // Codificar mensagem para URL de forma mais simples
-    const mensagemEncoded = encodeURIComponent(mensagem);
-    console.log('Mensagem codificada:', mensagemEncoded);
-    
-    // Salvar log antes de abrir WhatsApp
-    try {
-        await salvarLogWhatsApp(userName, motivoFinal, telefoneAtual, codigoLojaAtual, tipoLojaAtual);
-    } catch (error) {
-        console.error('Erro ao salvar log:', error);
-        // Continuar mesmo se o log falhar
-    }
-    
-    // Verificar se telefone já está limpo (apenas números)
-    const telefoneLimpo = telefoneAtual.replace(/[^\d]/g, '');
-    console.log('Telefone original:', telefoneAtual);
-    console.log('Telefone limpo:', telefoneLimpo);
-    console.log('Tamanho do telefone:', telefoneLimpo.length);
-    
-    // Verificar se o telefone tem tamanho válido (10 ou 11 dígitos)
-    if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
-        console.error('Telefone com tamanho inválido:', telefoneLimpo.length);
-        mostrarNotificacao('Número de telefone inválido', 'error');
-        return;
-    }
-    
-    // Criar URL do WhatsApp de forma mais simples
-    const whatsappUrl = `https://wa.me/55${telefoneLimpo}?text=${mensagemEncoded}`;
-    
-    console.log('=== DEBUG WHATSAPP ===');
-    console.log('Telefone original:', telefoneAtual);
-    console.log('Telefone limpo:', telefoneLimpo);
-    console.log('Mensagem original:', mensagem);
-    console.log('Mensagem codificada:', mensagemEncoded);
-    console.log('URL final:', whatsappUrl);
-    console.log('=====================');
-    
-    // Abrir WhatsApp
-    console.log('Tentando abrir WhatsApp...');
-    
-    try {
-        // Método mais simples e direto
-        window.open(whatsappUrl, '_blank');
-        console.log('WhatsApp aberto com window.open!');
-        mostrarNotificacao('WhatsApp aberto com sucesso!', 'success');
-        
-    } catch (error) {
-        console.error('Erro ao abrir WhatsApp:', error);
-        mostrarNotificacao('Erro ao abrir WhatsApp: ' + error.message, 'error');
-    }
-    
-    // Fechar modal após um pequeno delay
-    setTimeout(() => {
-        closeWhatsAppModal();
-    }, 500);
-}
-
-// Função para salvar log do WhatsApp
-async function salvarLogWhatsApp(nome, motivo, telefone, codigoLoja, tipoLoja) {
-    const logData = {
-        nome: nome,
-        motivo: motivo,
-        telefone: telefone,
-        codigo_loja: codigoLoja,
-        tipo_loja: tipoLoja,
-        data_hora: new Date().toLocaleString('pt-BR'),
-        ip: await obterIP()
-    };
-    
-    try {
-        const response = await fetch('/log-whatsapp', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(logData)
-        });
-        
-        const result = await response.json();
-        
-        if (!result.sucesso) {
-            console.error('Erro ao salvar log:', result.erro);
-        }
-    } catch (error) {
-        console.error('Erro ao enviar log:', error);
-    }
-}
-
-// Função para obter IP do usuário
-async function obterIP() {
-    try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        return data.ip || 'Desconhecido';
-    } catch (error) {
-        return 'Desconhecido';
-    }
-}
