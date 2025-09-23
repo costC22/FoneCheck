@@ -127,7 +127,7 @@ function exibirTelefones() {
                 </div>
                 <div class="telefone-number">${telefone}</div>
             </div>
-            <button onclick="openWhatsAppModal('${telefone}')" class="whatsapp-btn" title="Abrir no WhatsApp">
+            <button onclick="console.log('Botão clicado:', '${telefone}'); openWhatsAppModal('${telefone}')" class="whatsapp-btn" title="Abrir no WhatsApp">
                 <i class="fab fa-whatsapp"></i>
                 <span>WhatsApp</span>
             </button>
@@ -372,9 +372,13 @@ let tipoLojaAtual = '';
 
 // Função para abrir o modal do WhatsApp
 function openWhatsAppModal(telefone) {
+    console.log('openWhatsAppModal chamada com:', telefone);
+    
     telefoneAtual = telefone;
     codigoLojaAtual = codigoBuscadoAtual || '';
     tipoLojaAtual = tipoBuscaAtual || '';
+    
+    console.log('Dados:', { telefoneAtual, codigoLojaAtual, tipoLojaAtual });
     
     // Preencher dados no modal
     const phoneElement = document.getElementById('phoneNumber');
@@ -394,6 +398,10 @@ function openWhatsAppModal(telefone) {
     const modal = document.getElementById('whatsappModal');
     if (modal) {
         modal.style.display = 'flex';
+        console.log('Modal exibido');
+        console.log('Modal style:', modal.style.display);
+    } else {
+        console.error('Modal não encontrado');
     }
     
     // Focar no primeiro campo
@@ -442,18 +450,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Função para abrir o WhatsApp com mensagem formatada
 async function openWhatsApp() {
+    console.log('=== INICIANDO openWhatsApp ===');
+    
     const form = document.getElementById('whatsappForm');
     if (!form) {
+        console.error('Formulário WhatsApp não encontrado!');
         mostrarNotificacao('Erro: Formulário não encontrado', 'error');
         return;
     }
     
     const formData = new FormData(form);
+    console.log('Formulário encontrado e dados capturados');
+    
     const userName = formData.get('userName');
     const reason = formData.get('reason');
     const customReason = formData.get('customReason');
     
+    console.log('Dados capturados:', { userName, reason, customReason });
+    
     if (!userName || !reason) {
+        console.error('Campos obrigatórios não preenchidos');
         mostrarNotificacao('Por favor, preencha todos os campos obrigatórios', 'error');
         return;
     }
@@ -465,47 +481,88 @@ async function openWhatsApp() {
     
     const motivoFinal = reason === 'Outro' ? customReason : reason;
     
-    // Criar mensagem formatada
+    // Criar mensagem formatada simples
     const mensagem = `Ola! Me chamo ${userName} e estou entrando em contato sobre ${motivoFinal} da loja ${tipoLojaAtual} numero ${codigoLojaAtual}.`;
     
-    // Codificar mensagem para URL
-    const mensagemEncoded = encodeURIComponent(mensagem);
+    console.log('Mensagem criada:', mensagem);
+    
+    // Codificar mensagem para URL de forma mais robusta
+    const mensagemEncoded = encodeURIComponent(mensagem).replace(/'/g, "%27").replace(/"/g, "%22");
+    console.log('Mensagem codificada:', mensagemEncoded);
     
     // Salvar log antes de abrir WhatsApp
     try {
         await salvarLogWhatsApp(userName, motivoFinal, telefoneAtual, codigoLojaAtual, tipoLojaAtual);
     } catch (error) {
         console.error('Erro ao salvar log:', error);
+        // Continuar mesmo se o log falhar
     }
     
-    // Limpar telefone (apenas números)
+    // Verificar se telefone já está limpo (apenas números)
     const telefoneLimpo = telefoneAtual.replace(/[^\d]/g, '');
+    console.log('Telefone original:', telefoneAtual);
+    console.log('Telefone limpo:', telefoneLimpo);
+    console.log('Tamanho do telefone:', telefoneLimpo.length);
     
-    // Verificar se o telefone tem tamanho válido
+    // Verificar se o telefone tem tamanho válido (10 ou 11 dígitos)
     if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
+        console.error('Telefone com tamanho inválido:', telefoneLimpo.length);
         mostrarNotificacao('Número de telefone inválido', 'error');
         return;
     }
     
-    // Criar URL do WhatsApp
+    // Criar URL do WhatsApp com método alternativo
     const whatsappUrl = `https://wa.me/55${telefoneLimpo}?text=${mensagemEncoded}`;
     
+    console.log('=== DEBUG WHATSAPP ===');
+    console.log('Telefone original:', telefoneAtual);
+    console.log('Telefone limpo:', telefoneLimpo);
+    console.log('Mensagem original:', mensagem);
+    console.log('Mensagem codificada:', mensagemEncoded);
+    console.log('URL final:', whatsappUrl);
+    console.log('=====================');
+    
     // Abrir WhatsApp
+    console.log('Tentando abrir WhatsApp...');
+    
     try {
-        const whatsappWindow = window.open(whatsappUrl, '_blank');
+        // Método alternativo: criar link temporário
+        const link = document.createElement('a');
+        link.href = whatsappUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
         
-        if (whatsappWindow) {
-            mostrarNotificacao('WhatsApp aberto com sucesso!', 'success');
-        } else {
-            mostrarNotificacao('Erro: Pop-ups podem estar bloqueados. Permita pop-ups para este site.', 'error');
-        }
+        // Adicionar ao DOM temporariamente e clicar
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        console.log('WhatsApp aberto com método alternativo!');
+        mostrarNotificacao('WhatsApp aberto com sucesso!', 'success');
+        
     } catch (error) {
         console.error('Erro ao abrir WhatsApp:', error);
-        mostrarNotificacao('Erro ao abrir WhatsApp', 'error');
+        
+        // Fallback: tentar window.open
+        try {
+            const whatsappWindow = window.open(whatsappUrl, '_blank');
+            if (whatsappWindow) {
+                console.log('WhatsApp aberto com fallback!');
+                mostrarNotificacao('WhatsApp aberto com sucesso!', 'success');
+            } else {
+                console.error('Falha ao abrir WhatsApp - possível bloqueio de pop-up');
+                mostrarNotificacao('Erro: Pop-ups podem estar bloqueados. Permita pop-ups para este site.', 'error');
+            }
+        } catch (fallbackError) {
+            console.error('Erro no fallback:', fallbackError);
+            mostrarNotificacao('Erro ao abrir WhatsApp: ' + fallbackError.message, 'error');
+        }
     }
     
-    // Fechar modal
-    closeWhatsAppModal();
+    // Fechar modal após um pequeno delay
+    setTimeout(() => {
+        closeWhatsAppModal();
+    }, 500);
 }
 
 // Função para salvar log do WhatsApp
