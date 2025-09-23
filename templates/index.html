@@ -1,359 +1,425 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FoneCheck - Sistema de Busca de Telefones</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <i class="fas fa-phone-alt"></i>
-                <h1>FoneCheck</h1>
-            </div>
-            <div class="credits">
-                <small>Desenvolvido por <strong>Angelica Pedroso</strong> e <strong>Bruno Costa</strong></small><br>
-                <small>Para Zamp - Burger King e Popeyes</small>
-            </div>
-        </header>
-
-        <!-- Alerta de Atualização -->
-        <div class="update-alert" id="updateAlert">
-            <div class="alert-content">
-                <div class="alert-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="alert-text">
-                    <strong>⚠️ IMPORTANTE:</strong> Os contatos precisam ser atualizados a cada <strong>1 hora</strong> em todos os chamados para garantir informações precisas.
-                </div>
-                <button class="alert-close" onclick="dismissAlert()" title="Fechar alerta">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+      <!-- Header -->
+      <header class="header">
+        <div class="logo">
+          <i class="fas fa-phone-alt"></i>
+          <h1>FoneCheck</h1>
         </div>
+        <div class="credits">
+          <small
+            >Desenvolvido por <strong>Angelica Pedroso</strong> e
+            <strong>Bruno Costa</strong></small
+          ><br />
+          <small>Para Zamp - Burger King e Popeyes</small>
+        </div>
+      </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Search Section -->
-            <div class="search-section">
-                <div class="search-card">
-                    <div class="search-header">
-                        <div class="search-icon">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <div class="search-info">
-                            <h2>Buscar Telefones</h2>
-                            <p>Sistema inteligente de busca por código da loja</p>
-                        </div>
-                    </div>
+      <!-- Alerta de Atualização -->
+      <div class="update-alert" id="updateAlert">
+        <div class="alert-content">
+          <div class="alert-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="alert-text">
+            <strong>⚠️ IMPORTANTE:</strong> Os contatos precisam ser atualizados
+            a cada <strong>1 hora</strong> em todos os chamados para garantir
+            informações precisas.
+          </div>
+          <button
+            class="alert-close"
+            onclick="dismissAlert()"
+            title="Fechar alerta"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
 
-                    <form class="search-form" id="searchForm">
-                        <div class="form-group">
-                            <label>Selecione o tipo de loja</label>
-                            <div class="tipo-options">
-                                <div class="tipo-option">
-                                    <input type="radio" name="tipoBusca" value="BK" id="tipoBK" checked>
-                                    <label for="tipoBK" class="tipo-card">
-                                        <div class="tipo-icon">
-                                            <i class="fas fa-hamburger"></i>
-                                        </div>
-                                        <div class="tipo-info">
-                                            <span class="tipo-name">Burger King</span>
-                                            <span class="tipo-codes">15xxx, 16xxx, 17xxx, 18xxx, 19xxx, 20xxx, 21xxx, 22xxx, 23xxx, 24xxx, 25xxx, 26xxx, 27xxx, 28xxx, 29xxx, 30xxx, 31xxx, 32xxx</span>
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="tipo-option">
-                                    <input type="radio" name="tipoBusca" value="PK" id="tipoPK">
-                                    <label for="tipoPK" class="tipo-card">
-                                        <div class="tipo-icon">
-                                            <i class="fas fa-drumstick-bite"></i>
-                                        </div>
-                                        <div class="tipo-info">
-                                            <span class="tipo-name">Popeyes</span>
-                                            <span class="tipo-codes">PLK + 12xxx, 13xxx, 14xxx</span>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="codigoInput">Digite o código da loja</label>
-                            <div class="input-group">
-                                <input type="text" id="codigoInput" placeholder="Digite o PLK Number ou BK Number da loja desejada" required>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="search-btn" id="searchBtn">
-                            <i class="fas fa-search"></i>
-                            <span>Buscar Telefones</span>
-                        </button>
-                    </form>
-                </div>
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Search Section -->
+        <div class="search-section">
+          <div class="search-card">
+            <div class="search-header">
+              <div class="search-icon">
+                <i class="fas fa-search"></i>
+              </div>
+              <div class="search-info">
+                <h2>Buscar Telefones</h2>
+                <p>Sistema inteligente de busca por código da loja</p>
+              </div>
             </div>
 
-            <!-- Add Section -->
-            <div class="add-section">
-                <div class="add-card">
-                    <div class="add-header">
-                        <div class="add-icon">
-                            <i class="fas fa-plus-circle"></i>
-                        </div>
-                        <div class="add-info">
-                            <h2>Adicionar Número</h2>
-                            <p>Adicione novos números de telefone</p>
-                        </div>
-                    </div>
-
-                    <form class="add-form" id="addNumberForm">
-                        <div class="form-row">
-                            <div class="form-field">
-                                <label for="newType">Tipo de Loja</label>
-                                <select id="newType" name="newType" required>
-                                    <option value="">Selecione o tipo...</option>
-                                    <option value="BK">Burger King</option>
-                                    <option value="PK">Popeyes</option>
-                                </select>
-                            </div>
-                            <div class="form-field">
-                                <label for="newCode">Código da Loja</label>
-                                <input type="text" id="newCode" name="newCode" placeholder="Ex: 15001 ou PLK12001" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-field">
-                                <label for="newStoreName">Nome da Loja</label>
-                                <input type="text" id="newStoreName" name="newStoreName" placeholder="Nome da loja">
-                            </div>
-                            <div class="form-field">
-                                <label for="newPhone">Telefone</label>
-                                <input type="text" id="newPhone" name="newPhone" placeholder="(XX) XXXXX-XXXX" required>
-                            </div>
-                        </div>
-                        <button type="submit" class="add-btn">
-                            <i class="fas fa-plus"></i>
-                            <span>Adicionar Número</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Help Section -->
-            <div class="help-section">
-                <div class="help-card">
-                    <div class="help-header">
-                        <div class="help-icon">
-                            <i class="fas fa-question-circle"></i>
-                        </div>
-                        <div class="help-info">
-                            <h2>Como Usar</h2>
-                            <p>Instruções para utilizar o sistema</p>
-                        </div>
-                    </div>
-                    <div class="help-content">
-                        <div class="help-item">
-                            <div class="help-step">1</div>
-                            <div class="help-text">
-                                <h3>Selecione o Tipo</h3>
-                                <p>Escolha entre Burger King ou Popeyes</p>
-                            </div>
-                        </div>
-                        <div class="help-item">
-                            <div class="help-step">2</div>
-                            <div class="help-text">
-                                <h3>Digite o Código</h3>
-                                <p>Informe o código da loja (ex: 15001 ou PLK12001)</p>
-                            </div>
-                        </div>
-                        <div class="help-item">
-                            <div class="help-step">3</div>
-                            <div class="help-text">
-                                <h3>Visualize os Resultados</h3>
-                                <p>Veja todos os telefones encontrados com acesso direto ao WhatsApp</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Results Section -->
-        <div class="results-section" id="resultsSection" style="display: none;">
-            <div class="results-header">
-                <div class="results-title">
-                    <i class="fas fa-phone"></i>
-                    <h2>Resultados da Busca</h2>
-                </div>
-                <div class="results-actions">
-                    <button class="export-btn" id="exportBtn">
-                        <i class="fas fa-download"></i>
-                        <span>Exportar</span>
-                    </button>
-                    <button class="export-separate-btn" id="exportSeparateBtn">
-                        <i class="fas fa-file-excel"></i>
-                        <span>Exportar Separado</span>
-                    </button>
-                    <button class="clear-btn" onclick="limparResultados()">
-                        <i class="fas fa-times"></i>
-                        <span>Limpar</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="results-summary">
-                <div class="summary-card">
-                    <div class="summary-icon">
-                        <i class="fas fa-drumstick-bite"></i>
-                    </div>
-                    <div class="summary-info">
-                        <div class="summary-value" id="tipoResultado">Popeyes</div>
-                        <div class="summary-label">Tipo de Loja</div>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-icon">
-                        <i class="fas fa-phone"></i>
-                    </div>
-                    <div class="summary-info">
-                        <div class="summary-value" id="totalTelefones">0</div>
-                        <div class="summary-label">Total de Telefones</div>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-icon">
-                        <i class="fas fa-hashtag"></i>
-                    </div>
-                    <div class="summary-info">
-                        <div class="summary-value" id="telefonesUnicos">0</div>
-                        <div class="summary-label">Telefones Únicos</div>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-icon">
-                        <i class="fas fa-key"></i>
-                    </div>
-                    <div class="summary-info">
-                        <div class="summary-value" id="codigoBuscado">-</div>
-                        <div class="summary-label">Código Buscado</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="filters-section">
-                <div class="filters-header">
-                    <h3>
-                        <i class="fas fa-filter"></i>
-                        Filtros
-                    </h3>
-                </div>
-                <div class="filter-group">
-                    <input type="text" id="filterTelefone" placeholder="Digite o telefone">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="filterDuplicados">
-                        <span class="checkmark"></span>
-                        Ocultar Duplicados
+            <form class="search-form" id="searchForm">
+              <div class="form-group">
+                <label>Selecione o tipo de loja</label>
+                <div class="tipo-options">
+                  <div class="tipo-option">
+                    <input
+                      type="radio"
+                      name="tipoBusca"
+                      value="BK"
+                      id="tipoBK"
+                      checked
+                    />
+                    <label for="tipoBK" class="tipo-card">
+                      <div class="tipo-icon">
+                        <i class="fas fa-hamburger"></i>
+                      </div>
+                      <div class="tipo-info">
+                        <span class="tipo-name">Burger King</span>
+                        <span class="tipo-codes"
+                          >15xxx, 16xxx, 17xxx, 18xxx, 19xxx, 20xxx, 21xxx,
+                          22xxx, 23xxx, 24xxx, 25xxx, 26xxx, 27xxx, 28xxx,
+                          29xxx, 30xxx, 31xxx, 32xxx</span
+                        >
+                      </div>
                     </label>
+                  </div>
+                  <div class="tipo-option">
+                    <input
+                      type="radio"
+                      name="tipoBusca"
+                      value="PK"
+                      id="tipoPK"
+                    />
+                    <label for="tipoPK" class="tipo-card">
+                      <div class="tipo-icon">
+                        <i class="fas fa-drumstick-bite"></i>
+                      </div>
+                      <div class="tipo-info">
+                        <span class="tipo-name">Popeyes</span>
+                        <span class="tipo-codes"
+                          >PLK + 12xxx, 13xxx, 14xxx</span
+                        >
+                      </div>
+                    </label>
+                  </div>
                 </div>
+              </div>
+
+              <div class="form-group">
+                <label for="codigoInput">Digite o código da loja</label>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    id="codigoInput"
+                    placeholder="Digite o PLK Number ou BK Number da loja desejada"
+                    required
+                  />
+                  <i class="fas fa-key"></i>
+                </div>
+              </div>
+
+              <button type="submit" class="search-btn" id="searchBtn">
+                <i class="fas fa-search"></i>
+                <span>Buscar Telefones</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Add Section -->
+        <div class="add-section">
+          <div class="add-card">
+            <div class="add-header">
+              <div class="add-icon">
+                <i class="fas fa-plus-circle"></i>
+              </div>
+              <div class="add-info">
+                <h2>Adicionar Número</h2>
+                <p>Adicione novos números de telefone</p>
+              </div>
             </div>
 
-            <div class="telefones-grid" id="telefonesGrid">
-                <!-- Telefones serão inseridos aqui via JavaScript -->
-            </div>
+            <form class="add-form" id="addNumberForm">
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="newType">Tipo de Loja</label>
+                  <select id="newType" name="newType" required>
+                    <option value="">Selecione o tipo...</option>
+                    <option value="BK">Burger King</option>
+                    <option value="PK">Popeyes</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="newCode">Código da Loja</label>
+                  <input
+                    type="text"
+                    id="newCode"
+                    name="newCode"
+                    placeholder="Ex: 15001 ou PLK12001"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="newStoreName">Nome da Loja</label>
+                  <input
+                    type="text"
+                    id="newStoreName"
+                    name="newStoreName"
+                    placeholder="Nome da loja"
+                  />
+                </div>
+                <div class="form-field">
+                  <label for="newPhone">Telefone</label>
+                  <input
+                    type="text"
+                    id="newPhone"
+                    name="newPhone"
+                    placeholder="(XX) XXXXX-XXXX"
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" class="add-btn">
+                <i class="fas fa-plus"></i>
+                <span>Adicionar Número</span>
+              </button>
+            </form>
+          </div>
         </div>
+
+        <!-- Help Section -->
+        <div class="help-section">
+          <div class="help-card">
+            <div class="help-header">
+              <div class="help-icon">
+                <i class="fas fa-question-circle"></i>
+              </div>
+              <div class="help-info">
+                <h2>Como Usar</h2>
+                <p>Instruções para utilizar o sistema</p>
+              </div>
+            </div>
+            <div class="help-content">
+              <div class="help-item">
+                <div class="help-step">1</div>
+                <div class="help-text">
+                  <h3>Selecione o Tipo</h3>
+                  <p>Escolha entre Burger King ou Popeyes</p>
+                </div>
+              </div>
+              <div class="help-item">
+                <div class="help-step">2</div>
+                <div class="help-text">
+                  <h3>Digite o Código</h3>
+                  <p>Informe o código da loja (ex: 15001 ou PLK12001)</p>
+                </div>
+              </div>
+              <div class="help-item">
+                <div class="help-step">3</div>
+                <div class="help-text">
+                  <h3>Visualize os Resultados</h3>
+                  <p>
+                    Veja todos os telefones encontrados com acesso direto ao
+                    WhatsApp
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Results Section -->
+      <div class="results-section" id="resultsSection" style="display: none">
+        <div class="results-header">
+          <div class="results-title">
+            <i class="fas fa-phone"></i>
+            <h2>Resultados da Busca</h2>
+          </div>
+          <div class="results-actions">
+            <button class="export-btn" id="exportBtn">
+              <i class="fas fa-download"></i>
+              <span>Exportar</span>
+            </button>
+            <button class="export-separate-btn" id="exportSeparateBtn">
+              <i class="fas fa-file-excel"></i>
+              <span>Exportar Separado</span>
+            </button>
+            <button class="clear-btn" onclick="limparResultados()">
+              <i class="fas fa-times"></i>
+              <span>Limpar</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="results-summary">
+          <div class="summary-card">
+            <div class="summary-icon">
+              <i class="fas fa-drumstick-bite"></i>
+            </div>
+            <div class="summary-info">
+              <div class="summary-value" id="tipoResultado">Popeyes</div>
+              <div class="summary-label">Tipo de Loja</div>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="summary-info">
+              <div class="summary-value" id="totalTelefones">0</div>
+              <div class="summary-label">Total de Telefones</div>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon">
+              <i class="fas fa-hashtag"></i>
+            </div>
+            <div class="summary-info">
+              <div class="summary-value" id="telefonesUnicos">0</div>
+              <div class="summary-label">Telefones Únicos</div>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon">
+              <i class="fas fa-key"></i>
+            </div>
+            <div class="summary-info">
+              <div class="summary-value" id="codigoBuscado">-</div>
+              <div class="summary-label">Código Buscado</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters-section">
+          <div class="filters-header">
+            <h3>
+              <i class="fas fa-filter"></i>
+              Filtros
+            </h3>
+          </div>
+          <div class="filter-group">
+            <input
+              type="text"
+              id="filterTelefone"
+              placeholder="Digite o telefone"
+            />
+            <label class="checkbox-label">
+              <input type="checkbox" id="filterDuplicados" />
+              <span class="checkmark"></span>
+              Ocultar Duplicados
+            </label>
+          </div>
+        </div>
+
+        <div class="telefones-grid" id="telefonesGrid">
+          <!-- Telefones serão inseridos aqui via JavaScript -->
+        </div>
+      </div>
     </div>
 
     <!-- Loading Modal -->
     <div class="loading-modal" id="loadingModal">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p>Buscando telefones...</p>
-        </div>
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <p>Buscando telefones...</p>
+      </div>
     </div>
 
     <!-- Notification -->
     <div class="notification" id="notification">
-        <div class="notification-content">
-            <div class="notification-icon">
-                <i class="fas fa-check"></i>
-            </div>
-            <div class="notification-text">
-                <span id="notificationMessage">Mensagem</span>
-            </div>
+      <div class="notification-content">
+        <div class="notification-icon">
+          <i class="fas fa-check"></i>
         </div>
+        <div class="notification-text">
+          <span id="notificationMessage">Mensagem</span>
+        </div>
+      </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <!-- WhatsApp Log Modal -->
-    <div class="modal-overlay" id="whatsappModal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon">
-                    <i class="fab fa-whatsapp"></i>
-                </div>
-                <div class="modal-title">
-                    <h3>Abrir WhatsApp</h3>
-                    <p>Preencha os dados para continuar</p>
-                </div>
-                <button class="modal-close" onclick="closeWhatsAppModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="whatsappForm">
-                    <div class="form-group">
-                        <label for="userName">Seu Nome *</label>
-                        <input type="text" id="userName" name="userName" required placeholder="Digite seu nome completo">
-                    </div>
-                    <div class="form-group">
-                        <label for="reason">Motivo da Solicitação *</label>
-                        <select id="reason" name="reason" required>
-                            <option value="">Selecione o motivo</option>
-                            <option value="Suporte Técnico">Suporte Técnico</option>
-                            <option value="Problema com Pedido">Problema com Pedido</option>
-                            <option value="Reclamação">Reclamação</option>
-                            <option value="Elogio">Elogio</option>
-                            <option value="Informação sobre Produto">Informação sobre Produto</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="customReasonGroup" style="display: none;">
-                        <label for="customReason">Especifique o motivo</label>
-                        <input type="text" id="customReason" name="customReason" placeholder="Descreva o motivo da solicitação">
-                    </div>
-                    <div class="form-group">
-                        <label>Telefone</label>
-                        <div class="phone-display">
-                            <i class="fas fa-phone"></i>
-                            <span id="phoneNumber"></span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Loja</label>
-                        <div class="store-display">
-                            <i class="fas fa-store"></i>
-                            <span id="storeCode"></span>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" onclick="closeWhatsAppModal()">
-                    <i class="fas fa-times"></i>
-                    Cancelar
-                </button>
-                <button type="button" class="btn-whatsapp" onclick="openWhatsApp()">
-                    <i class="fab fa-whatsapp"></i>
-                    Abrir WhatsApp
-                </button>
-            </div>
-        </div>
-    </div>
+     <script src="{{ url_for('static', filename='script.js') }}"></script>
 
-    </body>
-</html>
+     <!-- WhatsApp Log Modal -->
+     <div class="modal-overlay" id="whatsappModal" style="display: none;">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <div class="modal-icon">
+                     <i class="fab fa-whatsapp"></i>
+                 </div>
+                 <div class="modal-title">
+                     <h3>Abrir WhatsApp</h3>
+                     <p>Preencha os dados para continuar</p>
+                 </div>
+                 <button class="modal-close" onclick="closeWhatsAppModal()">
+                     <i class="fas fa-times"></i>
+                 </button>
+             </div>
+             <div class="modal-body">
+                 <form id="whatsappForm">
+                     <div class="form-group">
+                         <label for="userName">Seu Nome *</label>
+                         <input type="text" id="userName" name="userName" required placeholder="Digite seu nome completo">
+                     </div>
+                     <div class="form-group">
+                         <label for="reason">Motivo da Solicitação *</label>
+                         <select id="reason" name="reason" required>
+                             <option value="">Selecione o motivo</option>
+                             <option value="Suporte Técnico">Suporte Técnico</option>
+                             <option value="Problema com Pedido">Problema com Pedido</option>
+                             <option value="Reclamação">Reclamação</option>
+                             <option value="Elogio">Elogio</option>
+                             <option value="Informação sobre Produto">Informação sobre Produto</option>
+                             <option value="Outro">Outro</option>
+                         </select>
+                     </div>
+                     <div class="form-group" id="customReasonGroup" style="display: none;">
+                         <label for="customReason">Especifique o motivo</label>
+                         <input type="text" id="customReason" name="customReason" placeholder="Descreva o motivo da solicitação">
+                     </div>
+                     <div class="form-group">
+                         <label>Telefone</label>
+                         <div class="phone-display">
+                             <i class="fas fa-phone"></i>
+                             <span id="phoneNumber"></span>
+                         </div>
+                     </div>
+                     <div class="form-group">
+                         <label>Loja</label>
+                         <div class="store-display">
+                             <i class="fas fa-store"></i>
+                             <span id="storeCode"></span>
+                         </div>
+                     </div>
+                 </form>
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn-cancel" onclick="closeWhatsAppModal()">
+                     <i class="fas fa-times"></i>
+                     Cancelar
+                 </button>
+                 <button type="button" class="btn-whatsapp" onclick="openWhatsApp()">
+                     <i class="fab fa-whatsapp"></i>
+                     Abrir WhatsApp
+                 </button>
+             </div>
+         </div>
+     </div>
+
+   </body>
+ </html>
