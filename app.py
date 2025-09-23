@@ -44,15 +44,23 @@ def buscar_numeros_telefone_por_codigo(df, codigo, tipo_busca):
             is_correct_type = False
             
             if tipo_busca == 'BK':
-                # Burger King: códigos que começam com 15, 16, 17, 18, 20, 26, 28, 30, 31, 32
+                # Burger King: códigos que começam com 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
                 is_correct_type = (
                     colaborador.startswith('15') or
                     colaborador.startswith('16') or
                     colaborador.startswith('17') or
                     colaborador.startswith('18') or
+                    colaborador.startswith('19') or
                     colaborador.startswith('20') or
+                    colaborador.startswith('21') or
+                    colaborador.startswith('22') or
+                    colaborador.startswith('23') or
+                    colaborador.startswith('24') or
+                    colaborador.startswith('25') or
                     colaborador.startswith('26') or
+                    colaborador.startswith('27') or
                     colaborador.startswith('28') or
+                    colaborador.startswith('29') or
                     colaborador.startswith('30') or
                     colaborador.startswith('31') or
                     colaborador.startswith('32')
