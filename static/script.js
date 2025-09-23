@@ -131,6 +131,10 @@ function exibirTelefones() {
                 <i class="fab fa-whatsapp"></i>
                 <span>WhatsApp</span>
             </button>
+            <button onclick="testWhatsAppDirect('${telefone}')" class="whatsapp-btn" style="background: #ff6600; margin-left: 5px;" title="Teste Direto">
+                <i class="fas fa-bug"></i>
+                <span>Teste</span>
+            </button>
         </div>
     `).join('');
 }
@@ -450,14 +454,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Função para abrir o WhatsApp com mensagem formatada
 async function openWhatsApp() {
+    console.log('=== INICIANDO openWhatsApp ===');
+    
     const form = document.getElementById('whatsappForm');
+    if (!form) {
+        console.error('Formulário WhatsApp não encontrado!');
+        mostrarNotificacao('Erro: Formulário não encontrado', 'error');
+        return;
+    }
+    
     const formData = new FormData(form);
+    console.log('Formulário encontrado e dados capturados');
     
     const userName = formData.get('userName');
     const reason = formData.get('reason');
     const customReason = formData.get('customReason');
     
+    console.log('Dados capturados:', { userName, reason, customReason });
+    
     if (!userName || !reason) {
+        console.error('Campos obrigatórios não preenchidos');
         mostrarNotificacao('Por favor, preencha todos os campos obrigatórios', 'error');
         return;
     }
@@ -511,10 +527,22 @@ async function openWhatsApp() {
     console.log('=====================');
     
     // Abrir WhatsApp
-    window.open(whatsappUrl, '_blank');
+    console.log('Tentando abrir WhatsApp...');
     
-    // Mostrar notificação de sucesso
-    mostrarNotificacao('WhatsApp aberto com sucesso!', 'success');
+    try {
+        const whatsappWindow = window.open(whatsappUrl, '_blank');
+        
+        if (whatsappWindow) {
+            console.log('WhatsApp aberto com sucesso!');
+            mostrarNotificacao('WhatsApp aberto com sucesso!', 'success');
+        } else {
+            console.error('Falha ao abrir WhatsApp - possível bloqueio de pop-up');
+            mostrarNotificacao('Erro: Pop-ups podem estar bloqueados. Permita pop-ups para este site.', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao abrir WhatsApp:', error);
+        mostrarNotificacao('Erro ao abrir WhatsApp: ' + error.message, 'error');
+    }
     
     // Fechar modal após um pequeno delay
     setTimeout(() => {
@@ -561,5 +589,34 @@ async function obterIP() {
         return data.ip || 'Desconhecido';
     } catch (error) {
         return 'Desconhecido';
+    }
+}
+
+// Função de teste direto para WhatsApp (sem modal)
+function testWhatsAppDirect(telefone) {
+    console.log('=== TESTE DIRETO WHATSAPP ===');
+    console.log('Telefone:', telefone);
+    
+    const telefoneLimpo = telefone.replace(/[^\d]/g, '');
+    console.log('Telefone limpo:', telefoneLimpo);
+    
+    const mensagemTeste = 'Teste direto do sistema';
+    const mensagemEncoded = encodeURIComponent(mensagemTeste);
+    
+    const urlTeste = `https://wa.me/55${telefoneLimpo}?text=${mensagemEncoded}`;
+    console.log('URL de teste:', urlTeste);
+    
+    try {
+        const windowTeste = window.open(urlTeste, '_blank');
+        if (windowTeste) {
+            console.log('Teste direto: WhatsApp aberto com sucesso!');
+            mostrarNotificacao('Teste direto: WhatsApp aberto!', 'success');
+        } else {
+            console.error('Teste direto: Falha ao abrir WhatsApp');
+            mostrarNotificacao('Teste direto: Falha ao abrir WhatsApp', 'error');
+        }
+    } catch (error) {
+        console.error('Teste direto: Erro:', error);
+        mostrarNotificacao('Teste direto: Erro - ' + error.message, 'error');
     }
 }
