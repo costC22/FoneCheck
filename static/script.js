@@ -486,17 +486,29 @@ async function openWhatsApp() {
         // Continuar mesmo se o log falhar
     }
     
-    // Limpar telefone (remover caracteres especiais)
+    // Verificar se telefone já está limpo (apenas números)
     const telefoneLimpo = telefoneAtual.replace(/[^\d]/g, '');
     console.log('Telefone original:', telefoneAtual);
     console.log('Telefone limpo:', telefoneLimpo);
+    console.log('Tamanho do telefone:', telefoneLimpo.length);
     
-    // Abrir WhatsApp
+    // Verificar se o telefone tem tamanho válido (10 ou 11 dígitos)
+    if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
+        console.error('Telefone com tamanho inválido:', telefoneLimpo.length);
+        mostrarNotificacao('Número de telefone inválido', 'error');
+        return;
+    }
+    
+    // Criar URL do WhatsApp
     const whatsappUrl = `https://wa.me/55${telefoneLimpo}?text=${mensagemEncoded}`;
-    console.log('URL do WhatsApp:', whatsappUrl);
     
-    // Testar se a URL está correta
-    console.log('Testando URL:', whatsappUrl);
+    console.log('=== DEBUG WHATSAPP ===');
+    console.log('Telefone original:', telefoneAtual);
+    console.log('Telefone limpo:', telefoneLimpo);
+    console.log('Mensagem original:', mensagem);
+    console.log('Mensagem codificada:', mensagemEncoded);
+    console.log('URL final:', whatsappUrl);
+    console.log('=====================');
     
     // Abrir WhatsApp
     window.open(whatsappUrl, '_blank');
