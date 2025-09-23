@@ -486,8 +486,8 @@ async function openWhatsApp() {
     
     console.log('Mensagem criada:', mensagem);
     
-    // Codificar mensagem para URL de forma mais robusta
-    const mensagemEncoded = encodeURIComponent(mensagem).replace(/'/g, "%27").replace(/"/g, "%22");
+    // Codificar mensagem para URL de forma mais simples
+    const mensagemEncoded = encodeURIComponent(mensagem);
     console.log('Mensagem codificada:', mensagemEncoded);
     
     // Salvar log antes de abrir WhatsApp
@@ -511,7 +511,7 @@ async function openWhatsApp() {
         return;
     }
     
-    // Criar URL do WhatsApp com método alternativo
+    // Criar URL do WhatsApp de forma mais simples
     const whatsappUrl = `https://wa.me/55${telefoneLimpo}?text=${mensagemEncoded}`;
     
     console.log('=== DEBUG WHATSAPP ===');
@@ -526,37 +526,14 @@ async function openWhatsApp() {
     console.log('Tentando abrir WhatsApp...');
     
     try {
-        // Método alternativo: criar link temporário
-        const link = document.createElement('a');
-        link.href = whatsappUrl;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        
-        // Adicionar ao DOM temporariamente e clicar
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        console.log('WhatsApp aberto com método alternativo!');
+        // Método mais simples e direto
+        window.open(whatsappUrl, '_blank');
+        console.log('WhatsApp aberto com window.open!');
         mostrarNotificacao('WhatsApp aberto com sucesso!', 'success');
         
     } catch (error) {
         console.error('Erro ao abrir WhatsApp:', error);
-        
-        // Fallback: tentar window.open
-        try {
-            const whatsappWindow = window.open(whatsappUrl, '_blank');
-            if (whatsappWindow) {
-                console.log('WhatsApp aberto com fallback!');
-                mostrarNotificacao('WhatsApp aberto com sucesso!', 'success');
-            } else {
-                console.error('Falha ao abrir WhatsApp - possível bloqueio de pop-up');
-                mostrarNotificacao('Erro: Pop-ups podem estar bloqueados. Permita pop-ups para este site.', 'error');
-            }
-        } catch (fallbackError) {
-            console.error('Erro no fallback:', fallbackError);
-            mostrarNotificacao('Erro ao abrir WhatsApp: ' + fallbackError.message, 'error');
-        }
+        mostrarNotificacao('Erro ao abrir WhatsApp: ' + error.message, 'error');
     }
     
     // Fechar modal após um pequeno delay
