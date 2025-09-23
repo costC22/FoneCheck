@@ -291,6 +291,47 @@ def adicionar_numero():
     except Exception as e:
         return jsonify({'sucesso': False, 'erro': f'Erro ao adicionar número: {str(e)}'})
 
+@app.route('/log-whatsapp', methods=['POST'])
+def log_whatsapp():
+    """Endpoint para salvar log de cliques no WhatsApp."""
+    try:
+        dados = request.json
+        nome = dados.get('nome', '').strip()
+        motivo = dados.get('motivo', '').strip()
+        telefone = dados.get('telefone', '').strip()
+        codigo_loja = dados.get('codigo_loja', '').strip()
+        tipo_loja = dados.get('tipo_loja', '').strip()
+        data_hora = dados.get('data_hora', '').strip()
+        ip = dados.get('ip', '').strip()
+        
+        # Criar entrada do log
+        log_entry = {
+            'Data/Hora': data_hora,
+            'Nome': nome,
+            'Motivo': motivo,
+            'Telefone': telefone,
+            'Código Loja': codigo_loja,
+            'Tipo Loja': tipo_loja,
+            'IP': ip
+        }
+        
+        # Tentar ler arquivo de log existente ou criar novo
+        try:
+            log_df = pd.read_excel('whatsapp_logs.xlsx')
+        except FileNotFoundError:
+            log_df = pd.DataFrame()
+        
+        # Adicionar nova entrada
+        log_df = pd.concat([log_df, pd.DataFrame([log_entry])], ignore_index=True)
+        
+        # Salvar log
+        log_df.to_excel('whatsapp_logs.xlsx', index=False)
+        
+        return jsonify({'sucesso': True, 'mensagem': 'Log salvo com sucesso'})
+        
+    except Exception as e:
+        return jsonify({'sucesso': False, 'erro': f'Erro ao salvar log: {str(e)}'})
+
 @app.route('/health')
 def health_check():
     """Endpoint para verificar saúde da aplicação."""

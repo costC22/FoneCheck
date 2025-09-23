@@ -125,10 +125,10 @@ function exibirTelefones() {
                 </div>
                 <div class="telefone-number">${telefone}</div>
             </div>
-            <a href="https://wa.me/55${telefone}" target="_blank" class="whatsapp-btn" title="Abrir no WhatsApp">
+            <button onclick="openWhatsAppModal('${telefone}', '${codigoAtual}')" class="whatsapp-btn" title="Abrir no WhatsApp">
                 <i class="fab fa-whatsapp"></i>
                 <span>WhatsApp</span>
-            </a>
+            </button>
         </div>
     `).join('');
 }
@@ -362,3 +362,128 @@ function showAlert() {
         alert.style.animation = 'slideInDown 0.6s ease-out';
     }
 }
+
+// Variáveis globais para o modal WhatsApp
+let telefoneAtual = '';
+let codigoAtual = '';
+
+// Função para abrir o modal WhatsApp
+function openWhatsAppModal(telefone, codigo) {
+    telefoneAtual = telefone;
+    codigoAtual = codigo;
+    
+    // Preencher os dados no modal
+    document.getElementById('phoneNumber').textContent = telefone;
+    document.getElementById('storeCode').textContent = `${tipoBuscaAtual} ${codigo}`;
+    
+    // Limpar formulário
+    document.getElementById('whatsappForm').reset();
+    document.getElementById('customReasonGroup').style.display = 'none';
+    
+    // Mostrar modal
+    document.getElementById('whatsappModal').style.display = 'flex';
+}
+
+// Função para fechar o modal WhatsApp
+function closeWhatsAppModal() {
+    document.getElementById('whatsappModal').style.display = 'none';
+    telefoneAtual = '';
+    codigoAtual = '';
+}
+
+// Função para mostrar campo de motivo customizado
+function toggleCustomReason() {
+    const reason = document.getElementById('reason').value;
+    const customGroup = document.getElementById('customReasonGroup');
+    
+    if (reason === 'Outro') {
+        customGroup.style.display = 'block';
+        document.getElementById('customReason').required = true;
+    } else {
+        customGroup.style.display = 'none';
+        document.getElementById('customReason').required = false;
+    }
+}
+
+// Função para abrir WhatsApp com log
+async function openWhatsApp() {
+    const form = document.getElementById('whatsappForm');
+    const formData = new FormData(form);
+    
+    const userName = formData.get('userName');
+    const reason = formData.get('reason');
+    const customReason = formData.get('customReason');
+    
+    // Validação
+    if (!userName || !reason) {
+        mostrarNotificacao('Por favor, preencha todos os campos obrigatórios', 'error');
+        return;
+    }
+    
+    if (reason === 'Outro' && !customReason) {
+        mostrarNotificacao('Por favor, especifique o motivo da solicitação', 'error');
+        return;
+    }
+    
+    // Criar log
+    const logData = {
+        nome: userName,
+        motivo: reason === 'Outro' ? customReason : reason,
+        telefone: telefoneAtual,
+        codigo_loja: codigoAtual,
+        tipo_loja: tipoBuscaAtual,
+        data_hora: new Date().toISOString(),
+        ip: await getUserIP()
+    };
+    
+    // Salvar log
+    await salvarLogWhatsApp(logData);
+    
+    // Abrir WhatsApp
+    const whatsappUrl = `https://wa.me/55${telefoneAtual}`;
+    window.open(whatsappUrl, '_blank');
+    
+    // Fechar modal
+    closeWhatsAppModal();
+    
+    // Mostrar notificação
+    mostrarNotificacao('WhatsApp aberto! Log registrado com sucesso.', 'success');
+}
+
+// Função para obter IP do usuário
+async function getUserIP() {
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+    } catch (error) {
+        return 'IP não disponível';
+    }
+}
+
+// Função para salvar log do WhatsApp
+async function salvarLogWhatsApp(logData) {
+    try {
+        const response = await fetch('/log-whatsapp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(logData)
+        });
+        
+        if (!response.ok) {
+            console.error('Erro ao salvar log do WhatsApp');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar log do WhatsApp:', error);
+    }
+}
+
+// Adicionar evento ao campo de motivo
+document.addEventListener('DOMContentLoaded', function() {
+    const reasonSelect = document.getElementById('reason');
+    if (reasonSelect) {
+        reasonSelect.addEventListener('change', toggleCustomReason);
+    }
+});
