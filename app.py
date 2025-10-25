@@ -1,16 +1,35 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, session, redirect, url_for
 import pandas as pd
 import re
 import os
 import io
+import hashlib
+from functools import wraps
 
 app = Flask(__name__)
+app.secret_key = 'fonecheck_secret_key_2024'  # Chave secreta para sessões
 
 # Caminho do arquivo Excel fixo
 EXCEL_FILE = 'incident.xlsx'
 
 # Números específicos para exclusão (conforme código original)
 NUMEROS_EXCLUIDOS = ['+5531996272142', '+5527981824400']
+
+# Credenciais de acesso (em produção, usar banco de dados)
+USERS = {
+    'admin': hashlib.sha256('admin123'.encode()).hexdigest(),
+    'fonecheck': hashlib.sha256('fonecheck2024'.encode()).hexdigest(),
+    'user': hashlib.sha256('user123'.encode()).hexdigest()
+}
+
+def login_required(f):
+    """Decorator para proteger rotas que requerem autenticação."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'logged_in' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 def encontrar_telefones(row):
     """Encontra e retorna os números de telefone válidos presentes na linha."""
@@ -123,12 +142,46 @@ def processar_busca(codigo, tipo_busca):
             'erro': str(e)
         }
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Página de login."""
+    if request.method == 'POST':
+        data = request.json
+        username = data.get('username', '').strip()
+        password = data.get('password', '').strip()
+        remember = data.get('remember', False)
+        
+        if username in USERS:
+            password_hash = hashlib.sha256(password.encode()).hexdigest()
+            if USERS[username] == password_hash:
+                session['logged_in'] = True
+                session['username'] = username
+                if remember:
+                    session.permanent = True
+                return jsonify({'success': True, 'message': 'Login realizado com sucesso!'})
+        
+        return jsonify({'success': False, 'message': 'Credenciais inválidas!'})
+    
+    # Se já estiver logado, redirecionar para a página principal
+    if 'logged_in' in session:
+        return redirect(url_for('index'))
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    """Logout do usuário."""
+    session.clear()
+    return redirect(url_for('login'))
+
 @app.route('/')
+@login_required
 def index():
     """Página principal."""
     return render_template('index.html')
 
 @app.route('/buscar', methods=['POST'])
+@login_required
 def buscar_telefones():
     """Endpoint para buscar telefones por BK Number ou PK Number."""
     try:
@@ -151,6 +204,7 @@ def buscar_telefones():
         return jsonify({'sucesso': False, 'erro': f'Erro no servidor: {str(e)}'})
 
 @app.route('/exportar', methods=['POST'])
+@login_required
 def exportar_telefones():
     """Exporta lista de telefones para arquivo Excel."""
     try:
@@ -188,6 +242,7 @@ def exportar_telefones():
         return jsonify({'sucesso': False, 'erro': f'Erro na exportação: {str(e)}'})
 
 @app.route('/exportar-separado', methods=['POST'])
+@login_required
 def exportar_telefones_separados():
     """Exporta cada telefone em uma linha separada para arquivo Excel."""
     try:
@@ -231,6 +286,7 @@ def exportar_telefones_separados():
         return jsonify({'sucesso': False, 'erro': f'Erro na exportação separada: {str(e)}'})
 
 @app.route('/adicionar-numero', methods=['POST'])
+@login_required
 def adicionar_numero():
     """Adiciona um novo número ao arquivo Excel."""
     try:
@@ -284,6 +340,7 @@ def adicionar_numero():
         return jsonify({'sucesso': False, 'erro': f'Erro ao adicionar número: {str(e)}'})
 
 @app.route('/log-whatsapp', methods=['POST'])
+@login_required
 def log_whatsapp():
     """Endpoint para salvar log de cliques no WhatsApp."""
     try:

@@ -25,12 +25,23 @@
           <i class="fas fa-phone-alt"></i>
           <h1>FoneCheck</h1>
         </div>
-        <div class="credits">
-          <small
-            >Desenvolvido por <strong>Angelica Pedroso</strong> e
-            <strong>Bruno Costa</strong></small
-          ><br />
-          <small>Para Zamp - Burger King e Popeyes</small>
+        <div class="header-right">
+          <div class="credits">
+            <small
+              >Desenvolvido por <strong>Angelica Pedroso</strong> e
+              <strong>Bruno Costa</strong></small
+            ><br />
+            <small>Para Zamp - Burger King e Popeyes</small>
+          </div>
+          <div class="user-info">
+            <span class="user-name"
+              >Usuário: <strong>{{ session.username }}</strong></span
+            >
+            <a href="/logout" class="logout-btn">
+              <i class="fas fa-sign-out-alt"></i>
+              Sair
+            </a>
+          </div>
         </div>
       </header>
 
@@ -353,73 +364,93 @@
       </div>
     </div>
 
-     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
-     <!-- WhatsApp Log Modal -->
-     <div class="modal-overlay" id="whatsappModal" style="display: none;">
-         <div class="modal-content">
-             <div class="modal-header">
-                 <div class="modal-icon">
-                     <i class="fab fa-whatsapp"></i>
-                 </div>
-                 <div class="modal-title">
-                     <h3>Abrir WhatsApp</h3>
-                     <p>Preencha os dados para continuar</p>
-                 </div>
-                 <button class="modal-close" onclick="closeWhatsAppModal()">
-                     <i class="fas fa-times"></i>
-                 </button>
-             </div>
-             <div class="modal-body">
-                 <form id="whatsappForm">
-                     <div class="form-group">
-                         <label for="userName">Seu Nome *</label>
-                         <input type="text" id="userName" name="userName" required placeholder="Digite seu nome completo">
-                     </div>
-                     <div class="form-group">
-                         <label for="reason">Motivo da Solicitação *</label>
-                         <select id="reason" name="reason" required>
-                             <option value="">Selecione o motivo</option>
-                             <option value="Suporte Técnico">Suporte Técnico</option>
-                             <option value="Problema com Pedido">Problema com Pedido</option>
-                             <option value="Reclamação">Reclamação</option>
-                             <option value="Elogio">Elogio</option>
-                             <option value="Informação sobre Produto">Informação sobre Produto</option>
-                             <option value="Outro">Outro</option>
-                         </select>
-                     </div>
-                     <div class="form-group" id="customReasonGroup" style="display: none;">
-                         <label for="customReason">Especifique o motivo</label>
-                         <input type="text" id="customReason" name="customReason" placeholder="Descreva o motivo da solicitação">
-                     </div>
-                     <div class="form-group">
-                         <label>Telefone</label>
-                         <div class="phone-display">
-                             <i class="fas fa-phone"></i>
-                             <span id="phoneNumber"></span>
-                         </div>
-                     </div>
-                     <div class="form-group">
-                         <label>Loja</label>
-                         <div class="store-display">
-                             <i class="fas fa-store"></i>
-                             <span id="storeCode"></span>
-                         </div>
-                     </div>
-                 </form>
-             </div>
-             <div class="modal-footer">
-                 <button type="button" class="btn-cancel" onclick="closeWhatsAppModal()">
-                     <i class="fas fa-times"></i>
-                     Cancelar
-                 </button>
-                 <button type="button" class="btn-whatsapp" onclick="openWhatsApp()">
-                     <i class="fab fa-whatsapp"></i>
-                     Abrir WhatsApp
-                 </button>
-             </div>
-         </div>
-     </div>
-
-   </body>
- </html>
+    <!-- WhatsApp Log Modal -->
+    <div class="modal-overlay" id="whatsappModal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-icon">
+            <i class="fab fa-whatsapp"></i>
+          </div>
+          <div class="modal-title">
+            <h3>Abrir WhatsApp</h3>
+            <p>Preencha os dados para continuar</p>
+          </div>
+          <button class="modal-close" onclick="closeWhatsAppModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="whatsappForm">
+            <div class="form-group">
+              <label for="userName">Seu Nome *</label>
+              <input
+                type="text"
+                id="userName"
+                name="userName"
+                required
+                placeholder="Digite seu nome completo"
+              />
+            </div>
+            <div class="form-group">
+              <label for="reason">Motivo da Solicitação *</label>
+              <select id="reason" name="reason" required>
+                <option value="">Selecione o motivo</option>
+                <option value="Suporte Técnico">Suporte Técnico</option>
+                <option value="Problema com Pedido">Problema com Pedido</option>
+                <option value="Reclamação">Reclamação</option>
+                <option value="Elogio">Elogio</option>
+                <option value="Informação sobre Produto">
+                  Informação sobre Produto
+                </option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+            <div
+              class="form-group"
+              id="customReasonGroup"
+              style="display: none"
+            >
+              <label for="customReason">Especifique o motivo</label>
+              <input
+                type="text"
+                id="customReason"
+                name="customReason"
+                placeholder="Descreva o motivo da solicitação"
+              />
+            </div>
+            <div class="form-group">
+              <label>Telefone</label>
+              <div class="phone-display">
+                <i class="fas fa-phone"></i>
+                <span id="phoneNumber"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Loja</label>
+              <div class="store-display">
+                <i class="fas fa-store"></i>
+                <span id="storeCode"></span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn-cancel"
+            onclick="closeWhatsAppModal()"
+          >
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+          <button type="button" class="btn-whatsapp" onclick="openWhatsApp()">
+            <i class="fab fa-whatsapp"></i>
+            Abrir WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
