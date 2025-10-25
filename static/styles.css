@@ -706,6 +706,12 @@ body {
     flex: 1;
 }
 
+.telefone-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .telefone-icon {
     background: linear-gradient(135deg, #0066FF, #FF6600);
     border-radius: 8px;
@@ -754,6 +760,40 @@ body {
 }
 
 .whatsapp-btn span {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.remove-btn {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(239, 68, 68, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.remove-btn i {
+    font-size: 0.9rem;
+}
+
+.remove-btn span {
     font-size: 0.8rem;
     font-weight: 600;
 }
@@ -950,6 +990,18 @@ body {
     
     .telefones-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .telefone-actions {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+    }
+    
+    .whatsapp-btn,
+    .remove-btn {
+        width: 100%;
+        justify-content: center;
     }
     
     .alert-content {

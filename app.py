@@ -339,6 +339,66 @@ def adicionar_numero():
     except Exception as e:
         return jsonify({'sucesso': False, 'erro': f'Erro ao adicionar número: {str(e)}'})
 
+@app.route('/remover-contato', methods=['POST'])
+@login_required
+def remover_contato():
+    """Remove um contato do arquivo Excel."""
+    try:
+        dados = request.json
+        telefone = dados.get('telefone', '').strip()
+        codigo = dados.get('codigo', '').strip()
+        tipo = dados.get('tipo', '').strip()
+        
+        if not telefone:
+            return jsonify({'sucesso': False, 'erro': 'Telefone não informado'})
+        
+        # Verificar se o arquivo existe
+        if not os.path.exists(EXCEL_FILE):
+            return jsonify({'sucesso': False, 'erro': f'Arquivo {EXCEL_FILE} não encontrado'})
+        
+        # Ler o arquivo Excel
+        df = pd.read_excel(EXCEL_FILE)
+        
+        # Procurar e remover linhas que contenham o telefone
+        linhas_removidas = 0
+        for index, row in df.iterrows():
+            # Verificar se o telefone está em qualquer coluna da linha
+            for coluna in df.columns:
+                valor = str(row[coluna])
+                if telefone in valor:
+                    # Verificar se é a linha correta baseada no código e tipo
+                    colaborador = str(row.get('Colaborador', ''))
+                    if codigo in colaborador:
+                        # Verificar tipo de loja
+                        is_correct_type = False
+                        if tipo == 'BK':
+                            is_correct_type = any(colaborador.startswith(str(i)) for i in range(15, 33))
+                        else:  # PK
+                            colaborador_upper = colaborador.upper()
+                            is_correct_type = ('PLK' in colaborador_upper or 
+                                             any(colaborador.startswith(str(i)) for i in range(12, 15)))
+                        
+                        if is_correct_type:
+                            df = df.drop(index)
+                            linhas_removidas += 1
+                            break
+        
+        if linhas_removidas > 0:
+            # Salvar arquivo atualizado
+            df.to_excel(EXCEL_FILE, index=False)
+            return jsonify({
+                'sucesso': True,
+                'mensagem': f'Contato {telefone} removido com sucesso! ({linhas_removidas} linha(s) removida(s))'
+            })
+        else:
+            return jsonify({
+                'sucesso': False,
+                'erro': f'Contato {telefone} não encontrado para o código {codigo}'
+            })
+    
+    except Exception as e:
+        return jsonify({'sucesso': False, 'erro': f'Erro ao remover contato: {str(e)}'})
+
 @app.route('/log-whatsapp', methods=['POST'])
 @login_required
 def log_whatsapp():

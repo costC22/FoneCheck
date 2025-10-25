@@ -127,10 +127,16 @@ function exibirTelefones() {
                 </div>
                 <div class="telefone-number">${telefone}</div>
             </div>
-            <button onclick="openWhatsAppDirect('${telefone}')" class="whatsapp-btn" title="Abrir no WhatsApp">
-                <i class="fab fa-whatsapp"></i>
-                <span>WhatsApp</span>
-            </button>
+            <div class="telefone-actions">
+                <button onclick="openWhatsAppDirect('${telefone}')" class="whatsapp-btn" title="Abrir no WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </button>
+                <button onclick="removerContato('${telefone}')" class="remove-btn" title="Remover contato">
+                    <i class="fas fa-trash"></i>
+                    <span>Remover</span>
+                </button>
+            </div>
         </div>
     `).join('');
 }
@@ -401,6 +407,52 @@ function openWhatsAppDirect(telefone) {
     }
 }
 
+
+// Função para remover contato
+async function removerContato(telefone) {
+    if (!confirm(`Tem certeza que deseja remover o contato ${telefone}?\n\nEsta ação não pode ser desfeita.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/remover-contato', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                telefone: telefone,
+                codigo: codigoBuscadoAtual,
+                tipo: tipoBuscaAtual
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.sucesso) {
+            // Remover da lista local
+            telefonesData = telefonesData.filter(t => t !== telefone);
+            telefonesFiltrados = telefonesFiltrados.filter(t => t !== telefone);
+            
+            // Atualizar exibição
+            exibirTelefones();
+            atualizarResumo();
+            
+            mostrarNotificacao(`Contato ${telefone} removido com sucesso!`, 'success');
+        } else {
+            mostrarNotificacao(data.erro || 'Erro ao remover contato', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao remover contato:', error);
+        mostrarNotificacao('Erro ao remover contato. Tente novamente.', 'error');
+    }
+}
+
+// Função para atualizar resumo após remoção
+function atualizarResumo() {
+    document.getElementById('totalTelefones').textContent = telefonesData.length;
+    document.getElementById('telefonesUnicos').textContent = telefonesData.length;
+}
 
 // Função para mostrar/ocultar campo de motivo customizado
 document.addEventListener('DOMContentLoaded', function() {
