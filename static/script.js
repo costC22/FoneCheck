@@ -107,7 +107,7 @@ function exibirResultados(data, codigo) {
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Função para exibir telefones
+// Função para exibir telefones com lazy loading
 function exibirTelefones() {
     if (telefonesFiltrados.length === 0) {
         telefonesGrid.innerHTML = `
@@ -119,26 +119,49 @@ function exibirTelefones() {
         return;
     }
     
-    telefonesGrid.innerHTML = telefonesFiltrados.map(telefone => `
-        <div class="telefone-card">
-            <div class="telefone-content">
-                <div class="telefone-icon">
-            <i class="fas fa-phone"></i>
+    // Implementar lazy loading para grandes listas
+    const BATCH_SIZE = 50; // Processar 50 telefones por vez
+    let currentIndex = 0;
+    
+    function renderBatch() {
+        const batch = telefonesFiltrados.slice(currentIndex, currentIndex + BATCH_SIZE);
+        const batchHTML = batch.map(telefone => `
+            <div class="telefone-card" data-telefone="${telefone}">
+                <div class="telefone-content">
+                    <div class="telefone-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="telefone-number">${telefone}</div>
                 </div>
-                <div class="telefone-number">${telefone}</div>
+                <div class="telefone-actions">
+                    <button onclick="openWhatsAppDirect('${telefone}')" class="whatsapp-btn" title="Abrir no WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>WhatsApp</span>
+                    </button>
+                    <button onclick="removerContato('${telefone}')" class="remove-btn" title="Remover contato">
+                        <i class="fas fa-trash"></i>
+                        <span>Remover</span>
+                    </button>
+                </div>
             </div>
-            <div class="telefone-actions">
-                <button onclick="openWhatsAppDirect('${telefone}')" class="whatsapp-btn" title="Abrir no WhatsApp">
-                    <i class="fab fa-whatsapp"></i>
-                    <span>WhatsApp</span>
-                </button>
-                <button onclick="removerContato('${telefone}')" class="remove-btn" title="Remover contato">
-                    <i class="fas fa-trash"></i>
-                    <span>Remover</span>
-                </button>
-            </div>
-        </div>
-    `).join('');
+        `).join('');
+        
+        if (currentIndex === 0) {
+            telefonesGrid.innerHTML = batchHTML;
+        } else {
+            telefonesGrid.insertAdjacentHTML('beforeend', batchHTML);
+        }
+        
+        currentIndex += BATCH_SIZE;
+        
+        // Se ainda há mais itens, agendar próxima renderização
+        if (currentIndex < telefonesFiltrados.length) {
+            requestAnimationFrame(renderBatch);
+        }
+    }
+    
+    // Iniciar renderização
+    renderBatch();
 }
 
 // Função para aplicar filtros
@@ -472,5 +495,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+});
+
+// Otimizações de performance
+let filterTimeout;
+
+function debounceFilter(func, delay) {
+    return function(...args) {
+        clearTimeout(filterTimeout);
+        filterTimeout = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+// Aplicar filtros com debounce para melhor performance
+const aplicarFiltrosDebounced = debounceFilter(aplicarFiltros, 300);
+
+// Otimizar event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Usar debounce nos filtros
+    filterTelefone.removeEventListener('input', aplicarFiltros);
+    filterTelefone.addEventListener('input', aplicarFiltrosDebounced);
+    
+    // Manter change sem debounce para checkbox
+    filterDuplicados.addEventListener('change', aplicarFiltros);
 });
 

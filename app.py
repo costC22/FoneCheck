@@ -5,9 +5,18 @@ import os
 import io
 import hashlib
 from functools import wraps
+import time
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = 'fonecheck_secret_key_2024'  # Chave secreta para sessões
+
+# Cache para otimização
+CACHE_DATA = {
+    'df': None,
+    'last_modified': None,
+    'cache_duration': 300  # 5 minutos
+}
 
 # Caminho do arquivo Excel fixo
 EXCEL_FILE = 'incident.xlsx'
@@ -31,6 +40,58 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def get_cached_dataframe():
+    """Obtém o DataFrame do cache ou carrega do arquivo se necessário."""
+    global CACHE_DATA
+    
+    # Verificar se o arquivo existe
+    if not os.path.exists(EXCEL_FILE):
+        return None
+    
+    # Obter timestamp de modificação do arquivo
+    file_mtime = os.path.getmtime(EXCEL_FILE)
+    current_time = time.time()
+    
+    # Verificar se o cache é válido
+    if (CACHE_DATA['df'] is not None and 
+        CACHE_DATA['last_modified'] is not None and
+        CACHE_DATA['last_modified'] == file_mtime and
+        (current_time - CACHE_DATA['last_modified']) < CACHE_DATA['cache_duration']):
+        return CACHE_DATA['df']
+    
+    # Carregar dados do arquivo
+    try:
+        print(f"🔄 Carregando dados do Excel...")
+        start_time = time.time()
+        
+        # Usar engine otimizado para leitura
+        df = pd.read_excel(EXCEL_FILE, engine='openpyxl')
+        
+        # Otimizar tipos de dados
+        for col in df.columns:
+            if df[col].dtype == 'object':
+                df[col] = df[col].astype('string')
+        
+        # Atualizar cache
+        CACHE_DATA['df'] = df
+        CACHE_DATA['last_modified'] = file_mtime
+        
+        load_time = time.time() - start_time
+        print(f"✅ Dados carregados em {load_time:.2f}s - {len(df)} linhas")
+        
+        return df
+        
+    except Exception as e:
+        print(f"❌ Erro ao carregar Excel: {e}")
+        return None
+
+def clear_cache():
+    """Limpa o cache de dados."""
+    global CACHE_DATA
+    CACHE_DATA['df'] = None
+    CACHE_DATA['last_modified'] = None
+    print("🗑️ Cache limpo")
+
 def encontrar_telefones(row):
     """Encontra e retorna os números de telefone válidos presentes na linha."""
     telefones = []
@@ -52,79 +113,71 @@ def encontrar_telefones(row):
 
 def buscar_numeros_telefone_por_codigo(df, codigo, tipo_busca):
     """Busca números de telefone por código na coluna Colaborador, separando por tipo de loja."""
+    print(f"🔍 Buscando telefones para código {codigo} (tipo: {tipo_busca})")
+    start_time = time.time()
+    
     numeros_telefone = []
     
-    for index, row in df.iterrows():
-        colaborador = str(row.get('Colaborador', ''))
-        
-        # Verificar se o código está presente na coluna Colaborador
-        if codigo in colaborador:
-            # Determinar se é Burger King ou Popeyes baseado no tipo de busca
-            is_correct_type = False
-            
-            if tipo_busca == 'BK':
-                # Burger King: códigos que começam com 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
-                is_correct_type = (
-                    colaborador.startswith('15') or
-                    colaborador.startswith('16') or
-                    colaborador.startswith('17') or
-                    colaborador.startswith('18') or
-                    colaborador.startswith('19') or
-                    colaborador.startswith('20') or
-                    colaborador.startswith('21') or
-                    colaborador.startswith('22') or
-                    colaborador.startswith('23') or
-                    colaborador.startswith('24') or
-                    colaborador.startswith('25') or
-                    colaborador.startswith('26') or
-                    colaborador.startswith('27') or
-                    colaborador.startswith('28') or
-                    colaborador.startswith('29') or
-                    colaborador.startswith('30') or
-                    colaborador.startswith('31') or
-                    colaborador.startswith('32')
-                )
-            else:  # PK
-                # Popeyes: PLK OU códigos que começam com 12, 13, 14
-                colaborador_upper = colaborador.upper()
-                is_correct_type = (
-                    'PLK' in colaborador_upper or
-                    colaborador.startswith('12') or
-                    colaborador.startswith('13') or
-                    colaborador.startswith('14')
-                )
-            
-            if is_correct_type:
-                # Excluir colunas específicas
-                colunas_excluir = ['Colaborador', 'Telefone comercial', 'BK/PLK Number']
-                row_filtrado = row.drop(labels=colunas_excluir, errors='ignore')
-                telefones = encontrar_telefones(row_filtrado)
-                numeros_telefone.extend(telefones)
+    # Otimização: filtrar linhas que contêm o código primeiro
+    mask_codigo = df['Colaborador'].str.contains(codigo, na=False)
+    df_filtrado = df[mask_codigo]
+    
+    print(f"📊 {len(df_filtrado)} linhas encontradas com código {codigo}")
+    
+    # Definir padrões de validação de tipo
+    if tipo_busca == 'BK':
+        # Burger King: códigos 15-32
+        bk_patterns = [str(i) for i in range(15, 33)]
+        mask_tipo = df_filtrado['Colaborador'].str.startswith(tuple(bk_patterns))
+    else:  # PK
+        # Popeyes: PLK ou códigos 12-14
+        pk_patterns = [str(i) for i in range(12, 15)]
+        mask_plk = df_filtrado['Colaborador'].str.upper().str.contains('PLK', na=False)
+        mask_codigo_pk = df_filtrado['Colaborador'].str.startswith(tuple(pk_patterns))
+        mask_tipo = mask_plk | mask_codigo_pk
+    
+    df_final = df_filtrado[mask_tipo]
+    print(f"📊 {len(df_final)} linhas válidas para tipo {tipo_busca}")
+    
+    # Processar apenas as linhas válidas
+    for index, row in df_final.iterrows():
+        # Excluir colunas específicas
+        colunas_excluir = ['Colaborador', 'Telefone comercial', 'BK/PLK Number']
+        row_filtrado = row.drop(labels=colunas_excluir, errors='ignore')
+        telefones = encontrar_telefones(row_filtrado)
+        numeros_telefone.extend(telefones)
+    
+    search_time = time.time() - start_time
+    print(f"✅ Busca concluída em {search_time:.2f}s - {len(numeros_telefone)} telefones encontrados")
     
     return numeros_telefone
 
 def processar_busca(codigo, tipo_busca):
     """Processa busca no arquivo Excel fixo e retorna telefones encontrados."""
     try:
-        # Verificar se o arquivo existe
-        if not os.path.exists(EXCEL_FILE):
+        print(f"🚀 Iniciando busca otimizada para {codigo} ({tipo_busca})")
+        start_time = time.time()
+        
+        # Usar cache para obter dados
+        df = get_cached_dataframe()
+        if df is None:
             return {
                 'sucesso': False,
-                'erro': f'Arquivo {EXCEL_FILE} não encontrado'
+                'erro': f'Arquivo {EXCEL_FILE} não encontrado ou erro ao carregar'
             }
-        
-        # Ler o arquivo Excel
-        df = pd.read_excel(EXCEL_FILE)
         
         # Buscar números de telefone
         numeros_telefone = buscar_numeros_telefone_por_codigo(df, codigo, tipo_busca)
         
-        # Remover números duplicados
+        # Remover números duplicados (otimizado)
         numeros_telefone_unicos = list(set(numeros_telefone))
         
-        # Excluir números específicos
+        # Excluir números específicos (otimizado)
         numeros_filtrados = [numero for numero in numeros_telefone_unicos 
                            if numero not in NUMEROS_EXCLUIDOS]
+        
+        total_time = time.time() - start_time
+        print(f"⚡ Busca completa em {total_time:.2f}s")
         
         return {
             'sucesso': True,
@@ -133,10 +186,12 @@ def processar_busca(codigo, tipo_busca):
             'colunas': df.columns.tolist(),
             'total_linhas': len(df),
             'tipo_busca': tipo_busca,
-            'codigo': codigo
+            'codigo': codigo,
+            'tempo_busca': round(total_time, 2)
         }
     
     except Exception as e:
+        print(f"❌ Erro na busca: {e}")
         return {
             'sucesso': False,
             'erro': str(e)
@@ -301,12 +356,10 @@ def adicionar_numero():
         if tipo not in ['BK', 'PK']:
             return jsonify({'sucesso': False, 'erro': 'Tipo inválido'})
         
-        # Verificar se o arquivo existe
-        if not os.path.exists(EXCEL_FILE):
+        # Usar cache para obter dados
+        df = get_cached_dataframe()
+        if df is None:
             return jsonify({'sucesso': False, 'erro': f'Arquivo {EXCEL_FILE} não encontrado'})
-        
-        # Ler o arquivo Excel
-        df = pd.read_excel(EXCEL_FILE)
         
         # Criar nova linha
         tipo_nome = 'Burger King' if tipo == 'BK' else 'Popeyes'
@@ -331,6 +384,9 @@ def adicionar_numero():
         # Salvar arquivo
         df.to_excel(EXCEL_FILE, index=False)
         
+        # Limpar cache para forçar recarregamento
+        clear_cache()
+        
         return jsonify({
             'sucesso': True,
             'mensagem': f'Número {telefone} adicionado com sucesso para {tipo_nome} - {codigo}'
@@ -352,12 +408,10 @@ def remover_contato():
         if not telefone:
             return jsonify({'sucesso': False, 'erro': 'Telefone não informado'})
         
-        # Verificar se o arquivo existe
-        if not os.path.exists(EXCEL_FILE):
+        # Usar cache para obter dados
+        df = get_cached_dataframe()
+        if df is None:
             return jsonify({'sucesso': False, 'erro': f'Arquivo {EXCEL_FILE} não encontrado'})
-        
-        # Ler o arquivo Excel
-        df = pd.read_excel(EXCEL_FILE)
         
         # Procurar e remover linhas que contenham o telefone
         linhas_removidas = 0
@@ -386,6 +440,10 @@ def remover_contato():
         if linhas_removidas > 0:
             # Salvar arquivo atualizado
             df.to_excel(EXCEL_FILE, index=False)
+            
+            # Limpar cache para forçar recarregamento
+            clear_cache()
+            
             return jsonify({
                 'sucesso': True,
                 'mensagem': f'Contato {telefone} removido com sucesso! ({linhas_removidas} linha(s) removida(s))'
