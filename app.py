@@ -92,6 +92,53 @@ def clear_cache():
     CACHE_DATA['last_modified'] = None
     print("🗑️ Cache limpo")
 
+def salvar_historico_remocao(telefone, codigo, tipo, usuario):
+    """Salva o histórico de remoção para permitir restauração."""
+    try:
+        import json
+        from datetime import datetime
+        
+        # Dados da remoção
+        remocao_data = {
+            'telefone': telefone,
+            'codigo': codigo,
+            'tipo': tipo,
+            'usuario': usuario,
+            'data_remocao': datetime.now().isoformat(),
+            'restaurado': False
+        }
+        
+        # Carregar histórico existente
+        try:
+            with open('historico_remocoes.json', 'r', encoding='utf-8') as f:
+                historico = json.load(f)
+        except FileNotFoundError:
+            historico = []
+        
+        # Adicionar nova remoção
+        historico.append(remocao_data)
+        
+        # Salvar histórico
+        with open('historico_remocoes.json', 'w', encoding='utf-8') as f:
+            json.dump(historico, f, indent=2, ensure_ascii=False)
+        
+        print(f"📝 Histórico salvo: {telefone} removido por {usuario}")
+        
+    except Exception as e:
+        print(f"❌ Erro ao salvar histórico: {e}")
+
+def carregar_historico_remocoes():
+    """Carrega o histórico de remoções."""
+    try:
+        import json
+        with open('historico_remocoes.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+    except Exception as e:
+        print(f"❌ Erro ao carregar histórico: {e}")
+        return []
+
 def encontrar_telefones(row):
     """Encontra e retorna os números de telefone válidos presentes na linha."""
     telefones = []
@@ -438,6 +485,9 @@ def remover_contato():
                             break
         
         if linhas_removidas > 0:
+            # Salvar histórico da remoção
+            salvar_historico_remocao(telefone, codigo, tipo, session.get('username', 'unknown'))
+            
             # Salvar arquivo atualizado
             df.to_excel(EXCEL_FILE, index=False)
             
@@ -456,6 +506,103 @@ def remover_contato():
     
     except Exception as e:
         return jsonify({'sucesso': False, 'erro': f'Erro ao remover contato: {str(e)}'})
+
+@app.route('/historico-remocoes', methods=['GET'])
+@login_required
+def listar_historico_remocoes():
+    """Lista o histórico de remoções para restauração."""
+    try:
+        historico = carregar_historico_remocoes()
+        
+        # Filtrar apenas remoções não restauradas
+        remocoes_ativas = [r for r in historico if not r.get('restaurado', False)]
+        
+        return jsonify({
+            'sucesso': True,
+            'remocoes': remocoes_ativas,
+            'total': len(remocoes_ativas)
+        })
+    
+    except Exception as e:
+        return jsonify({'sucesso': False, 'erro': f'Erro ao carregar histórico: {str(e)}'})
+
+@app.route('/restaurar-contato', methods=['POST'])
+@login_required
+def restaurar_contato():
+    """Restaura um contato removido."""
+    try:
+        dados = request.json
+        telefone = dados.get('telefone', '').strip()
+        codigo = dados.get('codigo', '').strip()
+        tipo = dados.get('tipo', '').strip()
+        
+        if not all([telefone, codigo, tipo]):
+            return jsonify({'sucesso': False, 'erro': 'Dados incompletos para restauração'})
+        
+        # Carregar histórico
+        historico = carregar_historico_remocoes()
+        
+        # Encontrar a remoção correspondente
+        remocao_encontrada = None
+        for i, remocao in enumerate(historico):
+            if (remocao['telefone'] == telefone and 
+                remocao['codigo'] == codigo and 
+                remocao['tipo'] == tipo and 
+                not remocao.get('restaurado', False)):
+                remocao_encontrada = i
+                break
+        
+        if remocao_encontrada is None:
+            return jsonify({'sucesso': False, 'erro': 'Remoção não encontrada no histórico'})
+        
+        # Adicionar contato de volta ao Excel
+        df = get_cached_dataframe()
+        if df is None:
+            return jsonify({'sucesso': False, 'erro': 'Erro ao carregar dados'})
+        
+        # Criar nova linha (mesmo formato da adição)
+        tipo_nome = 'Burger King' if tipo == 'BK' else 'Popeyes'
+        nova_linha = {
+            'Colaborador': f'{codigo} - {tipo_nome}',
+            'Telefone': telefone,
+            'Telefone do solicitante': telefone,
+            'Nome': f'{codigo} - {tipo_nome}',
+            'Nome do solicitante': f'Usuário {tipo_nome}',
+            'Telefone do Gerente': '',
+            'BK/PLK Number': codigo,
+            'Nome completo do contato': f'{tipo_nome} - {codigo}',
+            'Gerente': '',
+            'Telefone comercial': '',
+            'Gerente.1': '',
+            'Telefone comercial.1': ''
+        }
+        
+        # Adicionar nova linha ao DataFrame
+        df = pd.concat([df, pd.DataFrame([nova_linha])], ignore_index=True)
+        
+        # Salvar arquivo
+        df.to_excel(EXCEL_FILE, index=False)
+        
+        # Marcar como restaurado no histórico
+        historico[remocao_encontrada]['restaurado'] = True
+        historico[remocao_encontrada]['data_restauracao'] = datetime.now().isoformat()
+        historico[remocao_encontrada]['usuario_restauracao'] = session.get('username', 'unknown')
+        
+        # Salvar histórico atualizado
+        import json
+        with open('historico_remocoes.json', 'w', encoding='utf-8') as f:
+            json.dump(historico, f, indent=2, ensure_ascii=False)
+        
+        # Limpar cache
+        clear_cache()
+        
+        return jsonify({
+            'sucesso': True,
+            'mensagem': f'Contato {telefone} restaurado com sucesso!'
+        })
+    
+    except Exception as e:
+        return jsonify({'sucesso': False, 'erro': f'Erro ao restaurar contato: {str(e)}'})
 
 @app.route('/log-whatsapp', methods=['POST'])
 @login_required

@@ -546,6 +546,27 @@ body {
     transform: translateY(-1px);
 }
 
+.historico-btn {
+    padding: 10px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.historico-btn:hover {
+    border-color: #8b5cf6;
+    color: #8b5cf6;
+    transform: translateY(-1px);
+}
+
 /* Results Summary */
 .results-summary {
     display: grid;
@@ -796,6 +817,88 @@ body {
 .remove-btn span {
     font-size: 0.8rem;
     font-weight: 600;
+}
+
+/* Histórico de Remoções */
+.historico-item {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+}
+
+.historico-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: #8b5cf6;
+}
+
+.historico-info {
+    flex: 1;
+}
+
+.historico-telefone {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+
+.historico-detalhes {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 3px;
+}
+
+.historico-data {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.restaurar-btn {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(139, 92, 246, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.restaurar-btn:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(139, 92, 246, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.restaurar-btn i {
+    font-size: 0.9rem;
+}
+
+.historico-vazio {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+}
+
+.historico-vazio i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
 }
 
 /* Loading Modal */

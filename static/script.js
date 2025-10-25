@@ -510,6 +510,117 @@ function debounceFilter(func, delay) {
 // Aplicar filtros com debounce para melhor performance
 const aplicarFiltrosDebounced = debounceFilter(aplicarFiltros, 300);
 
+// Função para mostrar histórico de remoções
+async function mostrarHistoricoRemocoes() {
+    const modal = document.getElementById('historicoModal');
+    const content = document.getElementById('historicoContent');
+    
+    // Mostrar modal
+    modal.style.display = 'flex';
+    
+    // Mostrar loading
+    content.innerHTML = `
+        <div class="loading-spinner"></div>
+        <p>Carregando histórico...</p>
+    `;
+    
+    try {
+        const response = await fetch('/historico-remocoes');
+        const data = await response.json();
+        
+        if (data.sucesso) {
+            if (data.remocoes.length === 0) {
+                content.innerHTML = `
+                    <div class="historico-vazio">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Nenhuma remoção encontrada</h3>
+                        <p>Não há contatos removidos para restaurar.</p>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = data.remocoes.map(remocao => `
+                    <div class="historico-item">
+                        <div class="historico-info">
+                            <div class="historico-telefone">${remocao.telefone}</div>
+                            <div class="historico-detalhes">
+                                <strong>Código:</strong> ${remocao.codigo} | 
+                                <strong>Tipo:</strong> ${remocao.tipo} | 
+                                <strong>Removido por:</strong> ${remocao.usuario}
+                            </div>
+                            <div class="historico-data">
+                                Removido em: ${new Date(remocao.data_remocao).toLocaleString('pt-BR')}
+                            </div>
+                        </div>
+                        <button class="restaurar-btn" onclick="restaurarContato('${remocao.telefone}', '${remocao.codigo}', '${remocao.tipo}')">
+                            <i class="fas fa-undo"></i>
+                            Restaurar
+                        </button>
+                    </div>
+                `).join('');
+            }
+        } else {
+            content.innerHTML = `
+                <div class="historico-vazio">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Erro ao carregar histórico</h3>
+                    <p>${data.erro}</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar histórico:', error);
+        content.innerHTML = `
+            <div class="historico-vazio">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Erro de conexão</h3>
+                <p>Não foi possível carregar o histórico. Tente novamente.</p>
+            </div>
+        `;
+    }
+}
+
+// Função para fechar modal de histórico
+function fecharHistoricoModal() {
+    document.getElementById('historicoModal').style.display = 'none';
+}
+
+// Função para restaurar contato
+async function restaurarContato(telefone, codigo, tipo) {
+    if (!confirm(`Tem certeza que deseja restaurar o contato ${telefone}?\n\nEste contato será adicionado novamente ao sistema.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/restaurar-contato', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                telefone: telefone,
+                codigo: codigo,
+                tipo: tipo
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.sucesso) {
+            mostrarNotificacao(`Contato ${telefone} restaurado com sucesso!`, 'success');
+            
+            // Recarregar histórico
+            setTimeout(() => {
+                mostrarHistoricoRemocoes();
+            }, 1000);
+        } else {
+            mostrarNotificacao(data.erro || 'Erro ao restaurar contato', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao restaurar contato:', error);
+        mostrarNotificacao('Erro ao restaurar contato. Tente novamente.', 'error');
+    }
+}
+
 // Otimizar event listeners
 document.addEventListener('DOMContentLoaded', function() {
     // Usar debounce nos filtros
